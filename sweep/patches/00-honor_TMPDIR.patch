@@ -1,0 +1,71 @@
+diff -Naur sweep-0.9.0/src/edit.c sweep-0.9.0-fixed/src/edit.c
+--- src/edit.c	2005-12-21 03:28:02.000000000 +0100
++++ src/edit.c	2006-10-08 10:33:14.000000000 +0200
+@@ -24,6 +24,7 @@
+ 
+ #include <stdio.h>
+ #include <string.h>
++#include <stdlib.h>
+ 
+ #include <unistd.h>
+ #include <sys/mman.h>
+@@ -43,6 +44,48 @@
+ #include "edit.h"
+ #include "format.h"
+ 
++int
++is_directory(const char *entity)
++{
++	struct stat stat_buf;
++
++	if (stat(entity, &stat_buf))
++		return 0;
++
++	return S_ISDIR(stat_buf.st_mode);
++}
++
++FILE *
++create_tmpfile(void)
++{
++	char *tmpdir;
++	size_t template_len;
++	char *template;
++	const char *filename_template = "sweepXXXXXX";
++	int fd;
++
++	tmpdir = getenv("TMPDIR");
++	if (!tmpdir || !is_directory(tmpdir)) {
++		tmpdir = "/tmp";
++	}
++
++	template_len = strlen(tmpdir) + strlen("/") + strlen(filename_template) + 1;
++	template = (char *) malloc(template_len);
++	if (!template)
++			return NULL;
++	snprintf(template, template_len, "%s/%s", tmpdir, filename_template);
++
++	fd = mkstemp(template);
++
++	unlink(template);
++
++	free(template);
++
++	if (fd < 0)
++		return NULL;
++
++	return fdopen(fd, "w+");
++}
+ 
+ sw_edit_buffer * ebuf = NULL;
+ 
+@@ -55,8 +98,8 @@
+   FILE * f;
+   int fd;
+ 
+-  if ((f = tmpfile ()) == NULL) {
+-    perror ("tmpfile failed in sweep_large_alloc_data");
++  if ((f = create_tmpfile ()) == NULL) {
++    perror ("create_tmpfile failed in sweep_large_alloc_data");
+     return NULL;
+   }
+ 
