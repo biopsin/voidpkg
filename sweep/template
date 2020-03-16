@@ -1,0 +1,27 @@
+# Template file for 'sweep-git'
+pkgname=sweep-git
+version=0.9.4
+revision=1
+_commit=129aa6fd4c71dbd9fdb78b705d33daed2d2b8b75
+wrksrc="sweep-${_commit}"
+build_style=gnu-configure
+hostmakedepends="automake libtool pkg-config gettext"
+makedepends="gtk+-devel alsa-lib-devel libsndfile-devel
+ libsamplerate-devel libvorbis-devel libmad-devel"
+depends="libtdb"
+short_desc="Audio editor and live playback tool"
+maintainer="Orphaned <orphan@voidlinux.org>"
+license="GPL-2.0-or-later"
+homepage="http://www.metadecks.org/software/sweep/index.html"
+distfiles="https://github.com/kfish/sweep/archive/${_commit}.tar.gz"
+checksum=cc66477ac5e2e79732e8748e0f3508baf711632d59152af27e5764adbcf40ace
+
+pre_configure() {
+	rm -r plugins/{echo,example}
+	NOCONFIGURE=1 ./autogen.sh
+}
+
+do_configure() {
+	./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var \
+	--disable-oss --disable-pulseaudio --disable-speex
+}
