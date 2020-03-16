@@ -1,0 +1,24 @@
+# Template file for 'xcalib'
+pkgname=xcalib
+version=0.10
+revision=1
+build_style="gnu-makefile"
+makedepends="libXrandr-devel libXxf86vm-devel"
+short_desc="Tiny monitor calibration loader for X.org"
+maintainer="Orphaned <orphan@voidlinux.org>"
+license="GPL-2.0-or-later"
+homepage="https://github.com/OpenICC/xcalib"
+distfiles="https://github.com/OpenICC/${pkgname}/archive/${version}.tar.gz"
+checksum="67dbf2dcc4ae67fde48b48630980c1fa6f89fda5810347f616ec85094c274055"
+
+post_extract() {
+	sed -i '/CC.*-o/s/$/ $(LDFLAGS)/' Makefile
+}
+
+do_install() {
+	vbin xcalib
+	vdoc README.md
+	for file in *.icc *.icm; do
+		vinstall "$file" 644 usr/share/xcalib
+	done
+}
