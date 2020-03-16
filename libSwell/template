@@ -1,0 +1,32 @@
+# Template file for 'libSwell'
+pkgname=libSwell
+version=20200115
+revision=1
+_commit=63943fbac273b847b733aceecdb16703679967b9
+wrksrc="WDL-${_commit}"
+build_style=gnu-configure
+make_build_args="GDK2=1"
+hostmakedepends="pkg-config"
+makedepends="gtk+-devel libXi-devel"
+short_desc="WDL is a set of simple C++ classes"
+maintainer="biopsin <biopsin@protonmail.com>"
+license="GPL-2-or-later"
+homepage="https://github.com/justinfrankel/WDL"
+distfiles="https://github.com/justinfrankel/WDL/archive/${_commit}.tar.gz"
+checksum=58322748334f6ef2549dd3658e3abaee0de6dbcebd3c72bcb9592fd972e28064
+
+do_configure() {
+	pkg-config --cflags --libs gtk+-2.0
+}
+
+do_build() {
+	cd ${wrksrc}/WDL/swell
+	make ${make_build_args}
+	# Create the default colortheme
+	make ${make_build_args} libSwell.colortheme
+}
+
+do_install() {
+	mkdir -p ${DESTDIR}/usr/lib/swell
+	cp ${wrksrc}/WDL/swell/{libSwell.so,libSwell.colortheme} ${DESTDIR}/usr/lib/swell
+}
