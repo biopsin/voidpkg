@@ -1,0 +1,17 @@
+style "ufraw-style"
+{
+	GtkTreeView::even-row-color = "#ddd"
+
+	bg_pixmap[NORMAL] = "<none>"
+	
+	font_name = "DejaVu Sans 12"
+	
+	text[NORMAL] = { 0, 0, 0 }
+	
+	GtkButton::inner-border = {0,0,0,0}
+	GtkComboBox::inner-border = {0,0,0,0}
+}
+
+widget "*" style "ufraw-style"
+class "*" style "ufraw-style"
+widget_class "*" style "ufraw-style"
