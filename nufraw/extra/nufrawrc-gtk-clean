@@ -1,0 +1,12 @@
+style "ufraw-style"
+{
+	font_name = "DejaVu Sans 8"
+	
+	GtkButton::inner-border = {0,0,0,0}
+	GtkComboBox::inner-border = {0,0,0,0}
+
+}
+
+widget "*" style "ufraw-style"
+class "*" style "ufraw-style"
+widget_class "*" style "ufraw-style"
