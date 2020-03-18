@@ -1,0 +1,22 @@
+From e2acdd5bbb9f91a2c059d54cff9e3f3d8966b303 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?S=C3=A9rgio=20M=2E=20Basto?= <sergio@serjux.com>
+Date: Tue, 14 May 2019 20:43:40 +0100
+Subject: [PATCH] Fix from https://sourceforge.net/p/ufraw/bugs/422/
+
+---
+ dcraw.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/dcraw.cc b/dcraw.cc
+index f9eab19..cef3b99 100644
+--- dcraw.cc
++++ dcraw.cc
+@@ -7176,7 +7176,7 @@ void CLASS parse_fuji (int offset)
+       c = order;
+       order = 0x4949;
+       while ((tag = get4()) > raw_width);
+-      width = tag;
++      width = get4();
+       height = get4();
+       order = c;
+     }
