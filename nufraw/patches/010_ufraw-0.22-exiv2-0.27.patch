@@ -1,0 +1,25 @@
+From a13c0f7385ff873bd7cf8fc8aae8657c75fb20c8 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?S=C3=A9rgio=20M=2E=20Basto?= <sergio@serjux.com>
+Date: Thu, 14 Feb 2019 01:56:49 +0000
+Subject: [PATCH] From Gentoo ufraw-0.22-exiv2-0.27.patch
+
+---
+ ufraw_exiv2.cc | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/ufraw_exiv2.cc b/ufraw_exiv2.cc
+index cba4c05..b0971b0 100644
+--- nufraw_exiv2.cc
++++ nufraw_exiv2.cc
+@@ -15,9 +15,8 @@
+ #include "nufraw.h"
+ 
+ #ifdef HAVE_EXIV2
+-#include <exiv2/image.hpp>
+-#include <exiv2/easyaccess.hpp>
+-#include <exiv2/exif.hpp>
++#include <exiv2/exiv2.hpp>
++#include <iostream>
+ #include <sstream>
+ #include <cassert>
+ 
