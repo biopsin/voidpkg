@@ -1,0 +1,41 @@
+style "ufraw-style"
+{
+	bg[NORMAL] = { 0.4, 0.4, 0.4 }
+	bg[ACTIVE] = { 0.37, 0.37, 0.37 }
+	bg[PRELIGHT] = { 0.45, 0.45, 0.45 }
+	bg[SELECTED] = { 0.5, 0.5, 0.5 }
+	bg[INSENSITIVE] = { 0.4, 0.4, 0.4 }
+
+	fg[NORMAL] = { 0.8, 0.8, 0.8 }
+	fg[ACTIVE] = { 0.77, 0.77, 0.77 }
+	fg[PRELIGHT] = { 1.0, 1.0, 1.0 } 
+	fg[SELECTED] = { 0.7, 0.7, 0.7 }
+	fg[INSENSITIVE] = { 0.4, 0.4, 0.4 }
+
+	text[NORMAL] = { 0.8, 0.8, 0.8 }
+	text[ACTIVE] = { 0.77, 0.77, 0.77 }
+	text[PRELIGHT] = { 0.95, 0.95, 0.95 }
+	text[SELECTED] = { 0.9, 0.9, 0.9 }
+	text[INSENSITIVE] = { 0.4, 0.4, 0.4 }
+
+	base[NORMAL] = { 0.5, 0.5, 0.5 }
+	base[ACTIVE] = { 0.55, 0.55, 0.55 }
+	base[PRELIGHT] = { 0.95, 0.5, 0.5 }
+	base[SELECTED] = { 0.6, 0.6, 0.6 }
+	base[INSENSITIVE] = { 0.4, 0.4, 0.4 }
+
+	GtkTreeView::even-row-color = "#666"
+	GtkTreeView::odd-row-color = "#555"
+
+	bg_pixmap[NORMAL] = "<none>"
+	
+	font_name = "DejaVu Sans 8"
+	
+	GtkButton::inner-border = {0,0,0,0}
+	GtkComboBox::inner-border = {0,0,0,0}
+
+}
+
+widget "*" style "ufraw-style"
+class "*" style "ufraw-style"
+widget_class "*" style "ufraw-style"
