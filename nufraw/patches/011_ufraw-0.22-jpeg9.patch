@@ -1,0 +1,40 @@
+From 22c55b1e08551e5ffc36ba23b276e50b285ff728 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?S=C3=A9rgio=20M=2E=20Basto?= <sergio@serjux.com>
+Date: Thu, 14 Feb 2019 01:58:05 +0000
+Subject: [PATCH] From Gentoo ufraw-0.22-jpeg9.patch
+
+Fix build with >=jpeg-9
+Thanks-to: Moran Z. <o542018138@gmail.com>
+---
+ dcraw.cc | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+ 
+--- dcraw.cc	2019-04-04 12:06:38.134375813 +0200
++++ dcraw.cc	2019-04-04 12:05:16.000000000 +0200
+@@ -2408,7 +2408,7 @@
+ #endif
+   cinfo->src->next_input_byte = jpeg_buffer;
+   cinfo->src->bytes_in_buffer = nbytes;
+-#if defined (__APPLE__) 
++#if defined(__linux__) || defined(__APPLE__)
+    return (boolean) TRUE;
+ #else
+   return TRUE;
+@@ -2428,7 +2428,7 @@
+   jpeg_create_decompress (&cinfo);
+   jpeg_stdio_src (&cinfo, ifp);
+   cinfo.src->fill_input_buffer = fill_input_buffer;
+-#if defined (__APPLE__) 
++#if defined(__linux__) || defined(__APPLE__)
+    jpeg_read_header (&cinfo, (boolean) TRUE);
+ #else
+   jpeg_read_header (&cinfo, TRUE);
+@@ -2505,7 +2505,7 @@
+     if (tile_length < INT_MAX)
+       fseek (ifp, get4(), SEEK_SET);
+     jpeg_stdio_src (&cinfo, ifp);
+-#if defined (__APPLE__) 
++#if defined(__linux__) || defined(__APPLE__)
+   	jpeg_read_header (&cinfo, (boolean) TRUE);
+ #else
+   	jpeg_read_header (&cinfo, TRUE);
