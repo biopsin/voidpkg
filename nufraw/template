@@ -1,0 +1,47 @@
+# Template build file for 'nufraw-plug'.
+pkgname=nufraw
+version=0.43
+revision=1
+wrksrc="${pkgname}-${version}-3"
+build_style=gnu-configure
+configure_args="--prefix=/usr --enable-extras --enable-mime --with-gtk
+ --with-gimp --enable-dst-correction --enable-contrast"
+hostmakedepends="automake gettext-devel intltool pkg-config"
+makedepends="lcms2-devel gtkimageview-devel exiv2-devel gimp-devel glib-devel"
+short_desc="A new version of the popular raw digital images manipulator ufraw."
+maintainer="biopsin <biopsin@yahoo.com>"
+license="GPL-2-or-later"
+homepage="https://sourceforge.net/projects/nufraw"
+distfiles="https://downloads.sourceforge.net/project/$pkgname/${pkgname}-${version}-3.tar.gz"
+checksum=2c7dcc1590993ec267b3112562b2433010d6f94f6acc6506c76aa29cf8c6c32c
+conflicts="ufraw ufraw-gimp"
+
+post_extract() {
+	## some fixups
+	cd ${wrksrc}
+	chmod +x mkinstalldirs generate_schemas.sh
+	mv nufraw.desktop{.desktop,}
+
+	## fix invalid suffix on literal (c++6/7)
+	sed '10212s/"dcraw v"/" dcraw v" /g' -i dcraw.cc
+
+	## fix icon corruption
+	cp -f ${FILESDIR}/film-24.png ${wrksrc}/icons/
+
+	## custom wb presets
+	cp -f ${FILESDIR}/wb_presets.c ${wrksrc}
+}
+
+pre_configure() {
+	./autogen.sh
+}
+
+do_configure() {
+	./configure ${configure_args}
+}
+
+do_install() {
+	vinstall nufraw-gimp 755 "usr/lib/gimp/2.0/plug-ins"
+  mkdir -p "${DESTDIR}/usr/share/mime/packages"
+	vcopy nufraw-mime.xml "usr/share/mime/packages"
+}
