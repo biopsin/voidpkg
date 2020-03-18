@@ -1,0 +1,38 @@
+From de809303632445f06da8894e534871ebb4c9d8f8 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?S=C3=A9rgio=20M=2E=20Basto?= <sergio@serjux.com>
+Date: Thu, 14 Feb 2019 02:46:23 +0000
+Subject: [PATCH] From Gentoo ufraw-0.17-cfitsio-automagic.patch
+
+---
+ configure.ac | 18 +++++++++++++-----
+ 1 file changed, 13 insertions(+), 5 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index ab5b919..9e78f61 100644
+--- configure.ac
++++ configure.ac
+@@ -188,11 +188,19 @@ PKG_CHECK_MODULES(LIBPNG, libpng >= 1.2,
+   [ have_png=no
+     AC_MSG_RESULT($LIBPNG_PKG_ERRORS) ] )
+ 
+-PKG_CHECK_MODULES(CFITSIO, cfitsio,
+-  [ have_cfitsio=yes
+-    AC_DEFINE(HAVE_LIBCFITSIO, 1, have the cfitsio library) ],
+-  [ have_cfitsio=no
+-    AC_MSG_RESULT($CFITSIO_PKG_ERRORS) ] )
++AC_ARG_WITH([cfitsio],
++  [AS_HELP_STRING([--with-cfitsio],
++  [build fits support @<:@default=check@:>@])],
++  [],
++  [with_cfitsio=check])
++
++have_cfitsio=no
++AS_IF([test "x$with_cfitsio" != xno],
++  [PKG_CHECK_MODULES(CFITSIO, cfitsio,
++    [ have_cfitsio=yes
++      AC_DEFINE(HAVE_LIBCFITSIO, 1, have the cfitsio library) ],
++    [ have_cfitsio=no
++      AC_MSG_RESULT($CFITSIO_PKG_ERRORS) ] ) ] )
+ 
+ PKG_CHECK_MODULES(EXIV2, exiv2 >= 0.20,
+   [ have_exiv2=yes
