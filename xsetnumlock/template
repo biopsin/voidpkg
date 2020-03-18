@@ -1,0 +1,22 @@
+# Template file for 'xsetnumlock'
+pkgname=xsetnumlock
+version=1.0
+revision=1
+wrksrc="xsetnumlock"
+makedepends="libXtst-devel"
+short_desc="Activate NumLock at startup"
+maintainer="biopsin <biopsin@yahoo.com>"
+license="NONE"
+homepage="http://www.linuxfromscratch.org/hints/downloads/files/numlock.txt"
+
+pre_build() {
+	cp ${FILESDIR}/xsetnumlock.c ${wrksrc}
+}
+
+do_build() {
+	gcc -o xsetnumlock xsetnumlock.c -lX11 -lXtst
+}
+
+do_install() {
+	vbin xsetnumlock
+}
