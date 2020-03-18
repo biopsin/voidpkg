@@ -184,12 +184,12 @@
 -#define WINDOW_SOLID	0
 -#define WINDOW_TRANS	1
 -#define WINDOW_ARGB	2
-+#define WINDOW_SOLID 1
-+#define WINDOW_TRANS 0
++#define WINDOW_SOLID 0
++#define WINDOW_TRANS 1
 +#define WINDOW_ARGB 2
  
 -#define TRANS_OPACITY	0.75
-+#define TRANS_OPACITY 0
++#define TRANS_OPACITY 0.0
  
  #define DEBUG_REPAINT 0
 -#define DEBUG_EVENTS  0
