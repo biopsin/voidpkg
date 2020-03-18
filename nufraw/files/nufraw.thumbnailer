@@ -1,0 +1,4 @@
+[Thumbnailer Entry]
+TryExec=nufraw-batch
+Exec=nufraw-batch --silent --size=%s --out-type=png --noexif --output=%o --overwrite --embedded-image %i
+MimeType=image/x-adobe-dng;image/x-dcraw;image/x-canon-cr2;image/x-canon-crw;image/x-fuji-raf;image/x-kodak-dcr;image/x-kodak-k25;image/x-kodak-kdc;image/x-minolta-mrw;image/x-nikon-nef;image/x-nikon-nrw;image/x-olympus-orf;image/x-panasonic-raw;image/x-panasonic-rw2;image/x-pentax-pef;image/x-sigma-x3f;image/x-sony-srf;image/x-sony-sr2;image/x-sony-arw;image/x-samsung-srw
