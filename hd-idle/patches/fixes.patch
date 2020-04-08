@@ -1,0 +1,123 @@
+--- hd-idle.c	2014-04-06 21:53:51.000000000 +0200
++++ hd-idle.c	2020-04-08 13:53:57.993496020 +0200
+@@ -123,12 +123,15 @@
+ #include <stdarg.h>
+ 
+ #include <fcntl.h>
++#include <sys/sysmacros.h>
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ #include <sys/ioctl.h>
+ #include <scsi/sg.h>
+ #include <scsi/scsi.h>
+ 
++#define TAG "hd-idle: "
++
+ #define STAT_FILE "/proc/diskstats"
+ #define DEFAULT_IDLE_TIME 600
+ 
+@@ -179,7 +182,7 @@
+ 
+   /* create default idle-time parameter entry */
+   if ((it = malloc(sizeof(*it))) == NULL) {
+-    fprintf(stderr, "out of memory\n");
++    fprintf(stderr, TAG "out of memory\n");
+     exit(1);
+   }
+   it->next = NULL;
+@@ -199,7 +202,7 @@
+     case 'a':
+       /* add a new set of idle-time parameters for this particular disk */
+       if ((it = malloc(sizeof(*it))) == NULL) {
+-        fprintf(stderr, "out of memory\n");
++        fprintf(stderr, TAG "out of memory\n");
+         return(2);
+       }
+       it->name = disk_name(optarg);
+@@ -227,11 +230,11 @@
+       return(0);
+ 
+     case ':':
+-      fprintf(stderr, "error: option -%c requires an argument\n", optopt);
++      fprintf(stderr, TAG "error: option -%c requires an argument\n", optopt);
+       return(1);
+ 
+     case '?':
+-      fprintf(stderr, "error: unknown option -%c\n", optopt);
++      fprintf(stderr, TAG "error: unknown option -%c\n", optopt);
+       return(1);
+     }
+   }
+@@ -282,7 +285,7 @@
+           continue;
+         }
+ 
+-        dprintf("probing %s: reads: %u, writes: %u\n", tmp.name, tmp.reads, tmp.writes);
++        dprintf(TAG "probing %s: reads: %u, writes: %u\n", tmp.name, tmp.reads, tmp.writes);
+ 
+         /* get previous statistics for this disk */
+         ds = get_diskstats(tmp.name);
+@@ -290,7 +293,7 @@
+         if (ds == NULL) {
+           /* new disk; just add it to the linked list */
+           if ((ds = malloc(sizeof(*ds))) == NULL) {
+-            fprintf(stderr, "out of memory\n");
++            fprintf(stderr, TAG "out of memory\n");
+             return(2);
+           }
+           memcpy(ds, &tmp, sizeof(*ds));
+@@ -370,7 +373,9 @@
+   }
+ 
+   /* change to root directory and close file descriptors */
+-  chdir("/");
++  if (chdir("/") == -1)
++	fprintf(stderr, "changing to root directory; %s\n",
++			strerror(errno));
+   maxfd = getdtablesize();
+   for (i = 0; i < maxfd; i++) {
+     close(i);
+@@ -378,8 +383,8 @@
+ 
+   /* use /dev/null for stdin, stdout and stderr */
+   open("/dev/null", O_RDONLY);
+-  open("/dev/null", O_WRONLY);
+-  open("/dev/null", O_WRONLY);
++  open("/dev/kmsg", O_WRONLY);
++  open("/dev/kmsg", O_WRONLY);
+ }
+ 
+ /* get DISKSTATS entry by name of disk */
+@@ -404,7 +409,7 @@
+   char dev_name[100];
+   int fd;
+ 
+-  dprintf("spindown: %s\n", name);
++  printf(TAG "spindown: %s\n", name);
+ 
+   /* fabricate SCSI IO request */
+   memset(&io_hdr, 0x00, sizeof(io_hdr));
+@@ -432,7 +437,7 @@
+     perror(buf);
+ 
+   } else if (io_hdr.masked_status != 0) {
+-    fprintf(stderr, "error: SCSI command failed with status 0x%02x\n",
++    fprintf(stderr, TAG "error: SCSI command failed with status 0x%02x\n",
+             io_hdr.masked_status);
+     if (io_hdr.masked_status == CHECK_CONDITION) {
+       phex(sense_buf, io_hdr.sb_len_wr, "sense buffer:\n");
+@@ -525,12 +530,12 @@
+   }
+ 
+   if ((s = strdup(s)) == NULL) {
+-    fprintf(stderr, "out of memory");
++    fprintf(stderr, TAG "out of memory");
+     exit(2);
+   }
+ 
+   if (debug) {
+-    printf("using %s for %s\n", s, path);
++    printf(TAG "using %s for %s\n", s, path);
+   }
+   return(s);
+ }
