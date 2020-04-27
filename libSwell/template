@@ -1,8 +1,8 @@
 # Template file for 'libSwell'
 pkgname=libSwell
-version=20200115
+version=20200416
 revision=1
-_commit=63943fbac273b847b733aceecdb16703679967b9
+_commit=62d50d4de7cc00bb54f77cdb8d5eb43191786922
 wrksrc="WDL-${_commit}"
 build_style=gnu-configure
 make_build_args="GDK2=1"
@@ -13,20 +13,25 @@ maintainer="biopsin <biopsin@protonmail.com>"
 license="GPL-2-or-later"
 homepage="https://github.com/justinfrankel/WDL"
 distfiles="https://github.com/justinfrankel/WDL/archive/${_commit}.tar.gz"
-checksum=58322748334f6ef2549dd3658e3abaee0de6dbcebd3c72bcb9592fd972e28064
+checksum=bdc626a2bd61f7a2fc899f5a852d5095e1468386ac27c97d4416399b746b137c
 
 do_configure() {
-	pkg-config --cflags --libs gtk+-2.0
+    pkg-config --cflags --libs gtk+-2.0
 }
 
 do_build() {
-	cd ${wrksrc}/WDL/swell
-	make ${make_build_args}
-	# Create the default colortheme
-	make ${make_build_args} libSwell.colortheme
+    cd ${wrksrc}/WDL/swell
+    make ${make_build_args}
+    # Create the default colortheme
+    make ${make_build_args} libSwell.colortheme
 }
 
+#post_build() {
+#    # Use custom colortheme
+#    cp ${FILESDIR}/* ${wrksrc}/WDL/swell
+#}
+
 do_install() {
-	mkdir -p ${DESTDIR}/usr/lib/swell
-	cp ${wrksrc}/WDL/swell/{libSwell.so,libSwell.colortheme} ${DESTDIR}/usr/lib/swell
+    mkdir -p ${DESTDIR}/usr/lib/swell
+    cp ${wrksrc}/WDL/swell/{libSwell.so,libSwell.colortheme} ${DESTDIR}/usr/lib/swell
 }
