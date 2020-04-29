@@ -1,0 +1,18 @@
+# Template file for 'pekwm-git'
+pkgname=pekwm-git
+version=20190220
+revision=2
+_githash=24f9f9b25e9877c37fc5e85cd6989c0a0e57da7b
+wrksrc="pekwm-${_githash}"
+build_style=cmake
+makedepends="libX11-devel libXft-devel fontconfig-devel"
+short_desc="Window manager based on aewm++"
+maintainer="biopsin <biopsin@yahoo.no>"
+license="GPL-2-or-later"
+homepage="https://www.pekwm.org/projects/pekwm"
+distfiles="https://github.com/pekdon/pekwm/archive/${_githash}.tar.gz"
+checksum=57fb6c716075e7db053c123fd7976645bc3fa7e2411edbe630162eb4850f4fe1
+
+post_extract() {
+	sed 's|DESTINATION etc|DESTINATION /etc|g' -i data/CMakeLists.txt
+}
