@@ -1,0 +1,64 @@
+# Template file for 'Pale Moon'
+pkgname=palemoon
+version=28.9.2
+revision=1
+wrksrc="Pale-Moon-${version}_Release"
+lib32disabled=yes
+hostmakedepends="git autoconf213 unzip zip pkg-config perl python yasm tar which"
+makedepends=" python-devel libatomic-devel gtk+-devel libSM-devel libXt-devel
+ alsa-lib-devel ffmpeg-devel libvpx-devel libpng-devel"
+depends="desktop-file-utils hicolor-icon-theme mime-types"
+short_desc="UXP-based web browser"
+maintainer="biopsin <biopsin@yahoo.no>"
+license="MPL-2.0, GPL-2.0-or-later, LGPL-2.1-or-later"
+homepage="https://www.palemoon.org"
+distfiles="https://github.com/MoonchildProductions/Pale-Moon/archive/${version}_Release.tar.gz"
+checksum=2aa14cee97d81616e5ccf12425f8bf5891de15c744fcb269c466b771ba2f4293
+
+post_extract() {
+	git clone https://github.com/MoonchildProductions/UXP.git ${wrksrc}/platform
+	cd ${wrksrc}/platform
+	git submodule init
+	git submodule update
+}
+
+do_configure() {
+	cp "${FILESDIR}/mozconfig" "${wrksrc}/.mozconfig"
+	mkdir -p /usr/lib/palemoon
+	export LDFLAGS+=" -Wl,-rpath=/usr/lib/palemoon"
+	export MOZ_MAKE_FLAGS="${makejobs}"
+}
+
+post_configure() {
+	for p in ${FILESDIR}/*.patch; do
+		patch -p0 -i $p
+	done
+
+	sed -i 's#xlocale#locale#' ${wrksrc}/platform/intl/icu/source/i18n/digitlst.cpp
+	sed -i 's#DEFAULT_GMAKE_FLAGS += NSS_ALLOW_SSLKEYLOGFILE=1#DEFAULT_GMAKE_FLAGS += NSS_ALLOW_SSLKEYLOGFILE=0#' ${wrksrc}/platform/config/external/nss/Makefile.in
+	sed -i 's#NSS_ALLOW_SSLKEYLOGFILE=1#NSS_ALLOW_SSLKEYLOGFILE=0#' ${wrksrc}/platform/security/nss/lib/ssl/ssl.gyp
+
+}
+
+do_build() {
+	rm -f ${wrksrc}/old-configure
+	./mach build
+}
+
+do_install() {
+	DESTDIR="$DESTDIR" ./mach install
+
+	for i in 16x16 32x32 48x48; do
+		vinstall ${wrksrc}/palemoon/branding/unstable/default${i%x*}.png 644 \
+			usr/share/icons/hicolor/${i}/apps palemoon.png
+	done
+
+	vinstall ${wrksrc}/palemoon/branding/official/palemoon.desktop 644 usr/share/applications
+
+	# Don't want the development or bundle stuff
+	rm -rf ${DESTDIR}/usr/{include,lib/palemoon-devel,share/idl}
+	rm -rf ${DESTDIR}/usr/lib/palemoon/browser/searchplugins
+
+	# https://bugzilla.mozilla.org/show_bug.cgi?id=658850
+	ln -sf palemoon ${DESTDIR}/usr/lib/palemoon/palemoon-bin
+}
