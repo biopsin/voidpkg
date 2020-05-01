@@ -19,7 +19,6 @@ ac_add_options --with-system-libvpx
 ac_add_options --with-system-png
 ac_add_options --with-system-zlib
 
-ac_add_options --disable-jemalloc
 ac_add_options --disable-strip
 ac_add_options --disable-gconf
 ac_add_options --disable-tests
