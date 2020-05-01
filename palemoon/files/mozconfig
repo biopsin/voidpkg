@@ -1,0 +1,53 @@
+mk_add_options MOZ_APP_PROFILE=palemoon
+
+ac_add_options --disable-official-branding
+ac_add_options --disable-official-vendor
+ac_add_options --enable-application=palemoon
+ac_add_options --with-user-appdir=.palemoon
+
+ac_add_options --enable-default-toolkit=cairo-gtk2-x11
+ac_add_options --enable-optimize="$CFLAGS"
+ac_add_options --enable-system-pixman
+ac_add_options --enable-system-ffi
+ac_add_options --enable-pie
+ac_add_options --enable-av1
+
+ac_add_options --with-system-cairo
+ac_add_options --with-system-bz2
+ac_add_options --with-system-jpeg
+ac_add_options --with-system-libvpx
+ac_add_options --with-system-png
+ac_add_options --with-system-zlib
+
+ac_add_options --disable-jemalloc
+ac_add_options --disable-strip
+ac_add_options --disable-gconf
+ac_add_options --disable-tests
+ac_add_options --disable-dbus
+ac_add_options --disable-necko-wifi
+ac_add_options --disable-webrtc
+ac_add_options --disable-eme
+ac_add_options --disable-elf-hack
+ac_add_options --disable-install-strip
+ac_add_options --disable-pulseaudio
+ac_add_options --disable-gamepad
+ac_add_options --disable-sync
+ac_add_options --disable-url-classifier
+ac_add_options --disable-crashreporter
+ac_add_options --disable-parental-controls
+ac_add_options --disable-safe-browsing
+ac_add_options --disable-accessibility
+ac_add_options --disable-devtools
+ac_add_options --disable-profiling
+ac_add_options --disable-userinfo
+ac_add_options --disable-updater
+
+ac_add_options --prefix=/usr
+ac_add_options --libdir=/usr/lib 
+ac_add_options --x-libraries=/usr/lib64
+ac_add_options --with-pthreads
+
+export MOZILLA_OFFICIAL=0
+export MOZ_APP_VENDOR=.palemoon
+export MOZ_APP_PROFILE=palemoon
+export MOZ_USER_DIR=.palemoon
