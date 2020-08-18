@@ -1,6 +1,6 @@
 # Template file for 'gimp'
 pkgname=gimp
-version=2.10.18
+version=2.10.20
 revision=1
 build_style=gnu-configure
 configure_args="--without-aa --without-wmf --without-webkit --disable-gtk-doc
