@@ -1,0 +1,22 @@
+# Template file for 'spacefm'
+pkgname=spacefm
+version=1.0.6
+revision=1
+build_options="--with-gtk2 --disable-startup-notification
+ --disable-desktop-integration --disable-video-thumbnails"
+build_style=gnu-configure
+configure_args="${build_options}"
+conf_files="/etc/spacefm/spacefm.conf"
+hostmakedepends="pkg-config intltool"
+makedepends="gtk+-devel eudev-libudev-devel"
+depends="hicolor-icon-theme desktop-file-utils"
+short_desc="Multi-panel tabbed file manager"
+maintainer="biopsin <biopsin@teknik.io>"
+license="GPL-3.0-or-later"
+homepage="http://ignorantguru.github.io/spacefm/"
+distfiles="https://github.com/IgnorantGuru/spacefm/archive/${version}.tar.gz"
+checksum=fedea9fcad776e0af4b8d90c5a1c86684a9c96ef1cdd4e959530ce93bdebe7c9
+
+post_install() {
+	rm -rf ${DESTDIR}/usr/share/locale
+}
