@@ -1,10 +1,11 @@
 # Template file for 'skippy-xd'
 pkgname=skippy-xd
-version=0.52
+version=200413
 revision=1
+_commit=b2cf2e242315fcd6dc941c899a25cd080c0e45e4
+wrksrc="skippy-xd-${_commit}"
 build_style=gnu-makefile
 make_build_args="CFG_NO_PNG=true CFG_NO_JPEG=true CFG_NO_GIF=true"
-wrksrc="${pkgname}-master"
 hostmakedepends="pkg-config"
 makedepends="libX11-devel libXext-devel libXft-devel libXcomposite-devel libXdamage-devel
  libXfixes-devel libXinerama-devel libXmu-devel libXrender-devel freetype-devel imlib2-devel
@@ -14,8 +15,8 @@ short_desc="An Expose-like full-screen task-switcher for X11"
 maintainer="Orphaned <orphan@voidlinux.org>"
 license="GPL-2"
 homepage="https://github.com/dreamcat4/skippy-xd"
-distfiles="${homepage}/archive/master.zip"
-checksum=3e5482d2bf77f02d15c776fadfe2473b4b4dd09f3138439f6d8c89c1b635bc66
+distfiles="${homepage}/archive/${_commit}.tar.gz"
+checksum=2d62a314288d3484a8d61f77a0a378f4755a1ae97120b65ccc38b1325e85a991
 
 do_install() {
     vbin skippy-xd
