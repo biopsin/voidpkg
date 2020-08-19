@@ -1,18 +1,18 @@
 # Template file for 'xwinmosaic'
 pkgname=xwinmosaic
-version=0.4.2.2
+version=0.4.3
 revision=1
 build_style=cmake
 configure_args="-DCMAKE_INSTALL_PREFIX=/usr"
-hostmakedepends="cmake pkg-config"
+hostmakedepends="pkg-config"
 makedepends="libXcomposite-devel gtk+-devel"
 short_desc="X11 window switcher with fancy look"
 maintainer="biopsin <biopsin@yahoo.com>"
 license="BSD-2-Clause-FreeBSD"
 homepage="https://github.com/ZaWertun/xwinmosaic"
 distfiles="${homepage}/archive/${version}.tar.gz"
-checksum=9a6cbb33371a46a4203fd9bb4291495dc7c514bcf834c6fa9023507b4d9378fe
+checksum=e99817c68efd4740f15502c2ea5bcabaf4fa88dec8f6902335ed37a7140edb8c
 
 post_install() {
-	vlicense LICENSE
+    vlicense LICENSE
 }
