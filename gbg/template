@@ -14,10 +14,6 @@ checksum=1379e01e27f60a6dffff4d5264aeb4f0f13787552cbe58ccc6862fc767551cfa
 build_options="comp"
 desc_option_comp="Provide workaround for compositors (experimental)"
 
-post_extract() {
-	sed -i "s|-45|0|g" gbg.c
-}
-
 do_build() {
 	make $(vopt_if comp BUILD=compositing)
 }
