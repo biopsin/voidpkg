@@ -1,0 +1,19 @@
+--- gbg.c	2020-03-06 09:58:40.000000000 +0100
++++ gbg.c	2020-08-21 14:24:27.494430403 +0200
+@@ -34,6 +34,7 @@
+     // Don't operate on a full size image, gradient production is slow
+     unsigned int img_height = height / 4;
+     unsigned int img_width = width / 4;
++	unsigned int img_angle = (double) (rand() % 180);
+ 
+     rgb color1;
+     rgb color2;
+@@ -66,7 +67,7 @@
+     // Second
+     imlib_context_set_color(color2.r, color2.g, color2.b, 255);
+     imlib_add_color_to_color_range(img_height);
+-    imlib_image_fill_color_range_rectangle(0, 0, img_width, img_height, -45.0);
++    imlib_image_fill_color_range_rectangle(0, 0, img_width, img_height, img_angle);
+ 
+     // Render our smaller image to the size of the screen
+     imlib_render_image_on_drawable_at_size(0, 0, width, height);
