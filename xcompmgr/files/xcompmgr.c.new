@@ -593,12 +593,14 @@ win_extents (Display *dpy, win *w) {
             ((*((long int *)w->a.visual) & CopyFromParent) == CopyFromParent)) {
 
                 draw_shadow = True; // don't ignore: alt+tab, dmenu
-            } else if (w->mode == WINDOW_ARGB || w->windowType == 0) {
-                draw_shadow = True; // don't ignore: unknown type, or transparent windows (new dunst > 1.5.0)
+            } else if (w->mode == WINDOW_ARGB) {
+                draw_shadow = True; // don't ignore: transparent windows (new dunst > 1.5.0)
             } else if (w->windowType==winTootipAtom ||
                     w->windowType==winComboAtom || 
                     w->windowType==winNotificationAtom) {
-                    draw_shadow = True; // don't ignore: toolkit windows, (old dunst < 1.5.0)
+                    draw_shadow = True; // don't ignore: toolkit windows
+            } else if (w->windowType == 0) {
+                draw_shadow = False; // ignore: unknown type
             }
 
     if (compMode != CompSimple && !(w->windowType == winDockAtom && excludeDockShadows) && draw_shadow) {
