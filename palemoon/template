@@ -1,6 +1,6 @@
 # Template file for 'Pale Moon'
 pkgname=palemoon
-version=28.12.0
+version=28.13.0
 revision=1
 wrksrc="Pale-Moon-${version}_Release"
 lib32disabled=yes
@@ -13,7 +13,7 @@ maintainer="biopsin <biopsin@yahoo.no>"
 license="MPL-2.0, GPL-2.0-or-later, LGPL-2.1-or-later"
 homepage="https://www.palemoon.org"
 distfiles="https://github.com/MoonchildProductions/Pale-Moon/archive/${version}_Release.tar.gz"
-checksum=c5b6feacb922aa31d9798f77bc1f4f23a65d7e94eadea1d4ad74bf19d4bf23d9
+checksum=c4bb72ab26d2913e6c0c373a252e3af2020468f5982a083561d03d24b93f3bd4
 
 post_extract() {
 	git clone https://github.com/MoonchildProductions/UXP.git ${wrksrc}/platform
