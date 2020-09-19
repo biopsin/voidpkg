@@ -1,0 +1,22 @@
+# Template file for 'adwm'
+pkgname=adwm
+version=0.7.11
+revision=1
+build_style=gnu-configure
+configure_args="--disable-startup-notification --with-x"
+hostmakedepends="autogen autoconf automake gettext-devel
+ libtool pkg-config asciidoc"
+makedepends="libXdamage-devel libXcomposite-devel cairo-devel pango-devel
+ libXpm-devel libjpeg-turbo-devel libXft-devel libSM-devel"
+short_desc="Full EWMH window manager fork of Echinus"
+maintainer="biopsin <biopsin@teknik.io>"
+license="GPL-3.0-or-later"
+homepage="https://github.com/bbidulock/adwm"
+distfiles="${homepage}/archive/${version}.tar.gz"
+checksum=5652625b5a24bf1aa369fcf336a9e9696859e68af3e4fffce8f3d69815e2ad4a
+
+pre_configure() {
+	local autogen_args
+	autogen_args="--prefix=/usr"
+	./autogen.sh ${autogen_args} ${configure_args}
+}
