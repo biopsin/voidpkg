@@ -1,6 +1,6 @@
 # Template file for 'bimp'
 pkgname=bimp
-version=2.3
+version=2.4
 revision=1
 build_style=gnu-makefile
 wrksrc="gimp-plugin-bimp-${version}"
@@ -11,7 +11,7 @@ maintainer="biopsin <biopsin@gmail.com>"
 license="GPL-2.0-or-later"
 homepage="https://alessandrofrancesconi.it/projects/bimp/"
 distfiles="https://github.com/alessandrofrancesconi/gimp-plugin-bimp/archive/v${version}.tar.gz"
-checksum=a9a2b364a8158b55f3fc461e9e58a38f0d4f0450c20386fca2ac1312d57dedc4
+checksum=4fb9db8c86679fe6240802bd20c060237d48e07d463c136b4bae99c6793a5508
 
 do_install(){
 	vinstall ${wrksrc}/bin/bimp 755 "usr/lib/gimp/2.0/plug-ins"
