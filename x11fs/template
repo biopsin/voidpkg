@@ -1,0 +1,19 @@
+# Template file for 'x11fs-git'
+pkgname=x11fs-git
+version=180620
+revision=1
+_commit=23ca813f7797ef3baac2e82bcdabca80d81a7616
+wrksrc="x11fs-${_commit}"
+build_style=gnu-makefile
+hostmakedepends="pkg-config"
+makedepends="libxcb-devel xcb-util-wm-devel fuse3-devel"
+short_desc="Tool for manipulating X windows"
+maintainer="biopsin <biopsin@yahoo.com>"
+license="custom"
+homepage="https://github.com/periish/x11fs"
+distfiles="${homepage}/archive/${_commit}.tar.gz"
+checksum=f0d89679755fa5d0dbfe327964d9ff709b2e8d8a6e52ff0c978b55bf8a80fb6e
+
+do_build() {
+	make CC="$CC" LDFLAGS="$LDFLAGS" ${makejobs}
+}
