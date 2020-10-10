@@ -1,6 +1,6 @@
 # Template file for 'gimp'
 pkgname=gimp
-version=2.10.20
+version=2.10.22
 revision=1
 build_style=gnu-configure
 configure_args="--without-aa --without-wmf --without-webkit --disable-gtk-doc
@@ -18,7 +18,7 @@ maintainer="Kartik S <kartik.ynwa@gmail.com>"
 license="GPL-3.0-only"
 homepage="https://www.gimp.org"
 distfiles="https://download.gimp.org/pub/gimp/v${version%.*}/gimp-${version}.tar.bz2"
-checksum=65bfe111e8eebffd3dde3016ccb507f9948d2663d9497cb438d9bb609e11d716
+checksum=2db84b57f3778d80b3466d7c21a21d22e315c7b062de2883cbaaeda9a0f618bb
 lib32disabled=yes
 
 pre_configure() {
