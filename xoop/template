@@ -1,0 +1,25 @@
+# Template file for 'xoop'
+pkgname=xoop
+version=1.0
+revision=1
+wrksrc="xoop-${version}"
+build_style=gnu-makefile
+hostmakedepends="git"
+makedepends="xcb-util-cursor-devel"
+short_desc="Loop X cursor around the edges of the screen"
+maintainer="biopsin <biopsin@yahoo.com>"
+license="MIT License"
+homepage="https://mcol.xyz/code/xoop/file/readme.html"
+
+do_extract() {
+	git clone https://mcol.xyz/code/xoop ${wrksrc}
+}
+
+do_build(){
+	CFLAGS=${CFLAGS}; make
+}
+
+do_install() {
+	vbin xoop
+	vlicense LICENSE
+}
