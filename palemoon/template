@@ -2,7 +2,7 @@
 pkgname=palemoon
 version=28.14.2
 revision=1
-wrksrc="Pale-Moon-${version}_Release"
+wrksrc="pale-moon"
 lib32disabled=yes
 hostmakedepends="git autoconf213 unzip zip pkg-config perl python yasm tar which"
 makedepends=" python-devel libatomic-devel gtk+-devel libSM-devel libXt-devel
@@ -12,8 +12,8 @@ short_desc="UXP-based web browser"
 maintainer="biopsin <biopsin@yahoo.no>"
 license="MPL-2.0, GPL-2.0-or-later, LGPL-2.1-or-later"
 homepage="https://www.palemoon.org"
-distfiles="https://github.com/MoonchildProductions/Pale-Moon/archive/${version}_Release.tar.gz"
-checksum=aca786624ed9aa8f2b7671605fc99c969d072acddc91cce8d6a5e9f8b6fc1f8e
+distfiles="https://repo.palemoon.org/MoonchildProductions/Pale-Moon/archive/${version}_Release.tar.gz"
+checksum=f1f24e9ecee32eed8070f6180d1a5d0f890ebbf107ce514c28a25f4c62ceb796
 
 post_extract() {
 	git clone https://github.com/MoonchildProductions/UXP.git ${wrksrc}/platform
