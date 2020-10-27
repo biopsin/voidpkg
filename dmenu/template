@@ -1,24 +1,42 @@
-# Template file for 'dmenu-git'
-pkgname=dmenu-git
-version=4.6
+# Template file for 'dmenu'
+pkgname=dmenu
+version=5.0
 revision=1
-_commit=7a998501e86790526b7ee4abbbf800175be9423d
-wrksrc="dmenu-overkill-${_commit}"
 makedepends="libXinerama-devel libXft-devel freetype-devel"
 short_desc="Generic menu for X"
-maintainer="Orphaned <orphan@voidlinux.org>"
+maintainer="Lugubris <lugubris@disroot.org>"
 license="MIT"
 homepage="https://tools.suckless.org/dmenu/"
-distfiles="https://github.com/duckwork/dmenu-overkill/archive/${_commit}.tar.gz"
-checksum=8b2cb8ec9fd684dc2d888cd33e16b7a514eb50303a41e90520d02e27afd6a57a
+distfiles="https://dl.suckless.org/tools/${pkgname}-${version}.tar.gz"
+checksum=fe18e142c4dbcf71ba5757dbbdea93b1c67d58fc206fc116664f4336deef6ed3
+patch_args="-Np1"
 
-post_extract() {
-	sed -e '/CFLAGS/{s/-Os//;s/=/+=/}' \
-		-e '/LDFLAGS/{s/-s//;s/=/+=/}' -i config.mk
-	sed -e "s|/usr/X11R6/|/usr/|g" -i config.mk
+build_options="fuzzymatch"
+desc_option_fuzzymatch="Enable Fuzzymatch support"
+
+post_patch() {
+    if [ "$build_option_fuzzymatch" ]; then
+        msg_normal "Applying fuzzymatch patches"
+        patch -slNp1 < "${FILESDIR}/fuzzymatch.patch"
+    fi
+    sed -i -e '/CFLAGS/{s/-Os//;s/=/+=/}' \
+        -e '/LDFLAGS/{s/-s//;s/=/+=/}' config.mk
+}
+
+do_build() {
+    [ -e ${FILESDIR}/config.h ] && cp ${FILESDIR}/config.h config.h
+    sed -i -e "s|^FREETYPEINC|#FREETYPEINC|g" \
+        -e "s|^X11INC|#X11INC|g" \
+        -e "s|^X11LIB|#X11LIB|g" config.mk
+
+    x11inc=$XBPS_CROSS_BASE/usr/include/X11
+    x11lib=$XBPS_CROSS_BASE/usr/lib
+    freetypeinc=$XBPS_CROSS_BASE/usr/include/freetype2
+    make CC="$CC" ${makejobs} X11INC=$x11inc X11LIB=$x11lib FREETYPEINC=$freetypeinc
 }
 
 do_install() {
-	make PREFIX=/usr DESTDIR=${DESTDIR} install
-	vlicense LICENSE
+    make PREFIX=/usr DESTDIR=${DESTDIR} install
+    vlicense LICENSE
 }
+
