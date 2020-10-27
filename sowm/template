@@ -1,0 +1,23 @@
+# Template file for 'sowm'
+pkgname=sowm
+version=201006
+revision=1
+_commit=ccb96521c191305b077fc423277f6b82effefb6a
+wrksrc="sowm-${_commit}"
+build_style=gnu-makefile
+makedepends="libX11-devel"
+short_desc="Itsy bitsy floating window manager"
+maintainer="shizonic <realtiaz@gmail.com>"
+license="MIT"
+homepage="https://github.com/dylanaraps/sowm"
+distfiles="${homepage}/archive/${_commit}.tar.gz"
+checksum=2182b48ac38b9c83452daa9d1cfb44aa1e944aaf2ff2971c6ee27986923699b6
+patch_args="-p1"
+
+post_extract() {
+	cp -f "${FILESDIR}/config.def.h" "${wrksrc}/config.def.h"
+}
+
+post_install() {
+	vlicense LICENSE.md
+}

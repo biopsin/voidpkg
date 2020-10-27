@@ -1,0 +1,204 @@
+From 8346ec7b7c0eee707fa7618f3188bceda18ca451 Mon Sep 17 00:00:00 2001
+From: Mark Edgar <medgar123@gmail.com>
+Date: Sat, 30 May 2020 12:09:38 +0200
+Subject: [PATCH 1/2] sowm: Allow custom button mapping.
+
+This patch introduces custom button (pointer / mouse) mapping functionality.
+`config.def.h` has the default mappings for MOD+Button1 (new function:
+`win_move`) and MOD+Button3 (new function: `win_resize`) and four new mappings:
+
+*   MOD+Button2 lowers the window (new function: `win_lower`)
+*   MOD+Shift+Button1 centers the window (`win_center`)
+*   MOD+Shift+Button2 kills the window (`win_kill`)
+*   MOD+Shift+Button3 makes the window full-screen (`win_fs`)
+
+Note that raising the window is a separate function (new function: `win_raise`)
+which doesn't necessarily need to be attached to an operation. For example, you
+could have a mapping to move a window without raising it.
+
+Mappings for other mouse buttons (Button4, etc) are also possible and can use
+any existing function, e.g. `run` to run a command.
+---
+ config.def.h | 17 +++++++++++++++++
+ sowm.c       | 47 +++++++++++++++++++++++++++++++++++++----------
+ sowm.h       | 11 +++++++++++
+ 3 files changed, 65 insertions(+), 10 deletions(-)
+
+diff --git a/sowm.c b/sowm.c
+index b4a39dd..b068011 100644
+--- a/sowm.c
++++ b/sowm.c
+@@ -16,6 +16,7 @@ static unsigned int ww, wh;
+ 
+ static Display      *d;
+ static XButtonEvent mouse;
++enum { MOVING = 1, SIZING = 2 } drag;
+ static Window       root;
+ 
+ static void (*events[LASTEvent])(XEvent *e) = {
+@@ -49,7 +50,7 @@ void notify_enter(XEvent *e) {
+ }
+ 
+ void notify_motion(XEvent *e) {
+-    if (!mouse.subwindow || cur->f) return;
++    if (!mouse.subwindow || !drag || cur->f) return;
+ 
+     while(XCheckTypedEvent(d, MotionNotify, e));
+ 
+@@ -57,10 +58,10 @@ void notify_motion(XEvent *e) {
+     int yd = e->xbutton.y_root - mouse.y_root;
+ 
+     XMoveResizeWindow(d, mouse.subwindow,
+-        wx + (mouse.button == 1 ? xd : 0),
+-        wy + (mouse.button == 1 ? yd : 0),
+-        MAX(1, ww + (mouse.button == 3 ? xd : 0)),
+-        MAX(1, wh + (mouse.button == 3 ? yd : 0)));
++        wx + (drag == MOVING ? xd : 0),
++        wy + (drag == MOVING ? yd : 0),
++        MAX(1, ww + (drag == SIZING ? xd : 0)),
++        MAX(1, wh + (drag == SIZING ? yd : 0)));
+ }
+ 
+ void key_press(XEvent *e) {
+@@ -72,12 +73,26 @@ void key_press(XEvent *e) {
+             keys[i].function(keys[i].arg);
+ }
+ 
++void win_move(const Arg arg) {
++	win_size(mouse.subwindow, &wx, &wy, &ww, &wh);
++	drag = MOVING;
++}
++
++void win_resize(const Arg arg) {
++	win_size(mouse.subwindow, &wx, &wy, &ww, &wh);
++	drag = SIZING;
++}
++
+ void button_press(XEvent *e) {
+     if (!e->xbutton.subwindow) return;
++    unsigned mod = mod_clean(e->xbutton.state);
+ 
+-    win_size(e->xbutton.subwindow, &wx, &wy, &ww, &wh);
+-    XRaiseWindow(d, e->xbutton.subwindow);
+     mouse = e->xbutton;
++    drag = 0;
++    for (unsigned int i = 0; i < sizeof(buttons)/sizeof(*buttons); ++i)
++        if (buttons[i].button == e->xbutton.button &&
++            mod_clean(buttons[i].mod) == mod)
++            buttons[i].function(buttons[i].arg);
+ }
+ 
+ void button_release(XEvent *e) {
+@@ -132,6 +147,18 @@ void win_center(const Arg arg) {
+     XMoveWindow(d, cur->w, (sw - ww) / 2, (sh - wh) / 2);
+ }
+ 
++void win_lower(const Arg arg) {
++	if (!cur) return;
++
++	XLowerWindow(d, cur->w);
++}
++
++void win_raise(const Arg arg) {
++	if (!cur) return;
++
++	XRaiseWindow(d, cur->w);
++}
++
+ void win_fs(const Arg arg) {
+     if (!cur) return;
+ 
+@@ -246,9 +273,9 @@ void input_grab(Window root) {
+                 XGrabKey(d, code, keys[i].mod | modifiers[j], root,
+                         True, GrabModeAsync, GrabModeAsync);
+ 
+-    for (i = 1; i < 4; i += 2)
+-        for (j = 0; j < sizeof(modifiers)/sizeof(*modifiers); j++)
+-            XGrabButton(d, i, MOD | modifiers[j], root, True,
++    for (i = 0; i < sizeof(buttons)/sizeof(*buttons); i++)
++        for (size_t j = 0; j < sizeof(modifiers)/sizeof(*modifiers); j++)
++            XGrabButton(d, buttons[i].button, buttons[i].mod | modifiers[j], root, True,
+                 ButtonPressMask|ButtonReleaseMask|PointerMotionMask,
+                 GrabModeAsync, GrabModeAsync, 0, 0);
+ 
+diff --git a/sowm.h b/sowm.h
+index 455ed93..460cc9a 100644
+--- a/sowm.h
++++ b/sowm.h
+@@ -26,6 +26,13 @@ struct key {
+     const Arg arg;
+ };
+ 
++struct button {
++	unsigned int mod;
++	unsigned int button;
++	void (*function)(const Arg arg);
++	const Arg arg;
++};
++
+ typedef struct client {
+     struct client *next, *prev;
+     int f, wx, wy;
+@@ -49,6 +56,10 @@ void win_del(Window w);
+ void win_fs(const Arg arg);
+ void win_focus(client *c);
+ void win_kill(const Arg arg);
++void win_lower(const Arg arg);
++void win_raise(const Arg arg);
++void win_move(const Arg arg);
++void win_resize(const Arg arg);
+ void win_prev(const Arg arg);
+ void win_next(const Arg arg);
+ void win_to_ws(const Arg arg);
+
+From eecf58097cd57c75e7b3993fcb9b2ad9a084ef72 Mon Sep 17 00:00:00 2001
+From: Mark Edgar <medgar123@gmail.com>
+Date: Sat, 30 May 2020 16:48:09 +0200
+Subject: [PATCH 2/2] correct tabs to spaces
+
+---
+ sowm.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/sowm.c b/sowm.c
+index b068011..26f52f9 100644
+--- a/sowm.c
++++ b/sowm.c
+@@ -74,13 +74,13 @@ void key_press(XEvent *e) {
+ }
+ 
+ void win_move(const Arg arg) {
+-	win_size(mouse.subwindow, &wx, &wy, &ww, &wh);
+-	drag = MOVING;
++    win_size(mouse.subwindow, &wx, &wy, &ww, &wh);
++    drag = MOVING;
+ }
+ 
+ void win_resize(const Arg arg) {
+-	win_size(mouse.subwindow, &wx, &wy, &ww, &wh);
+-	drag = SIZING;
++    win_size(mouse.subwindow, &wx, &wy, &ww, &wh);
++    drag = SIZING;
+ }
+ 
+ void button_press(XEvent *e) {
+@@ -148,15 +148,15 @@ void win_center(const Arg arg) {
+ }
+ 
+ void win_lower(const Arg arg) {
+-	if (!cur) return;
++    if (!cur) return;
+ 
+-	XLowerWindow(d, cur->w);
++    XLowerWindow(d, cur->w);
+ }
+ 
+ void win_raise(const Arg arg) {
+-	if (!cur) return;
++    if (!cur) return;
+ 
+-	XRaiseWindow(d, cur->w);
++    XRaiseWindow(d, cur->w);
+ }
+ 
+ void win_fs(const Arg arg) {

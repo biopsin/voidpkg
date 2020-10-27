@@ -1,0 +1,10 @@
+--- a/sowm.c	2020-09-20 14:07:13.000000000 +0200
++++ b/sowm.c	2020-09-20 14:07:20.573408083 +0200
+@@ -45,6 +45,7 @@
+ 
+ void notify_enter(XEvent *e) {
+     while(XCheckTypedEvent(d, EnterNotify, e));
++	while(XCheckTypedWindowEvent(d, mouse.subwindow, MotionNotify, e));
+ 
+     for win if (c->w == e->xcrossing.window) win_focus(c);
+ }
