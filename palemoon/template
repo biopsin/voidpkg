@@ -2,9 +2,10 @@
 pkgname=palemoon
 version=28.14.2
 revision=1
+uxpver=20201001
 wrksrc="pale-moon"
 lib32disabled=yes
-hostmakedepends="git autoconf213 unzip zip pkg-config perl python yasm tar which"
+hostmakedepends="curl autoconf213 unzip zip pkg-config perl python yasm tar which"
 makedepends=" python-devel libatomic-devel gtk+-devel libSM-devel libXt-devel
  alsa-lib-devel ffmpeg-devel libvpx-devel libpng-devel"
 depends="desktop-file-utils hicolor-icon-theme mime-types"
@@ -16,10 +17,9 @@ distfiles="https://repo.palemoon.org/MoonchildProductions/Pale-Moon/archive/${ve
 checksum=f1f24e9ecee32eed8070f6180d1a5d0f890ebbf107ce514c28a25f4c62ceb796
 
 post_extract() {
-	git clone https://github.com/MoonchildProductions/UXP.git ${wrksrc}/platform
-	cd ${wrksrc}/platform
-	git submodule init
-	git submodule update
+    curl https://repo.palemoon.org/MoonchildProductions/UXP/archive/RELBASE_${uxpver}.tar.gz -O ${builddir}
+    tar --strip-components=1 -xvzf RELBASE_${uxpver}.tar.gz -C platform/
+    rm RELBASE_${uxpver}.tar.gz
 }
 
 do_configure() {
