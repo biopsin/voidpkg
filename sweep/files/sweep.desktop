@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Sweep
+GenericName=Sound Editor
+Comment=Sweep Sound Editor
+Categories=Application;AudioVideo;
+Encoding=UTF-8
+Exec=sweep %F
+Icon=sweep.svg
+MimeType=audio/wav;audio/x-wav;audio/aiff;audio/x-aiff;audio/ogg;audio/x-ogg;audio/vorbis;audio/x-vorbis;audio/flac;audio/x-flac;audio/speex;audio/x-speex
+Terminal=false
+Type=Application
