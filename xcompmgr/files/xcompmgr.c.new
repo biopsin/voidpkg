@@ -591,16 +591,14 @@ win_extents (Display *dpy, win *w) {
     if (1 && w->windowType == winNormalAtom && 
             w->a.override_redirect && 
             ((*((long int *)w->a.visual) & CopyFromParent) == CopyFromParent)) {
-
                 draw_shadow = True; // don't ignore: alt+tab, dmenu
-            } else if (w->mode == WINDOW_ARGB) {
-                draw_shadow = True; // don't ignore: transparent windows (new dunst > 1.5.0)
-            } else if (w->windowType==winTootipAtom ||
-                    w->windowType==winComboAtom || 
+            } else if (w->mode == WINDOW_ARGB ||
+                    w->windowType==winTootipAtom ||
+                    w->windowType==winComboAtom ||
                     w->windowType==winNotificationAtom) {
-                    draw_shadow = True; // don't ignore: toolkit windows
+                        draw_shadow = True; // don't ignore:, dunst, toolkit windows aso..
             } else if (w->windowType == 0) {
-                draw_shadow = False; // ignore: unknown type
+                    draw_shadow = False; // ignore: unknown types..
             }
 
     if (compMode != CompSimple && !(w->windowType == winDockAtom && excludeDockShadows) && draw_shadow) {
@@ -860,9 +858,9 @@ paint_all (Display *dpy, XserverRegion region) {
         w->borderClip = None;
     }
     XFixesDestroyRegion (dpy, region);
-// # if 1
+# if 1
     XSync(dpy, False);
-// # endif
+# endif
     if (rootBuffer != rootPicture) {
         XFixesSetPictureClipRegion (dpy, rootBuffer, 0, 0, None);
         XRenderComposite (dpy, PictOpSrc, rootBuffer, None, rootPicture,
