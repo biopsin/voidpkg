@@ -1,0 +1,15 @@
+# Template file for 'fpm2'
+pkgname=fpm2
+version=0.80
+revision=1
+wrksrc="${pkgname}-${version}dev1"
+build_style=gnu-configure
+configure_args="--enable-gtk2 --disable-nls"
+hostmakedepends="pkg-config intltool"
+makedepends="gtk+-devel libxml2-devel"
+short_desc="Securely store your passwords"
+maintainer="biopsin <biopsin@teknik.io>"
+license="GPL License"
+homepage="http://fpm.sourceforge.net/"
+distfiles="https://als.regnet.cz/fpm2/download/${pkgname}-${version}dev1.tar.bz2"
+checksum=33d9313aea0a16e901d21bac684591a6df3aff9880aa5b7141dbff5637da79b0
