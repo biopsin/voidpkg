@@ -34,4 +34,9 @@ do_build() {
 do_install() {
     mkdir -p ${DESTDIR}/usr/lib/swell
     cp ${wrksrc}/WDL/swell/{libSwell.so,libSwell.colortheme} ${DESTDIR}/usr/lib/swell
+
+    # Override prebuilt swell
+    vmkdir usr/libexec/reaper
+    ln -sf /usr/lib/swell/libSwell.so "${DESTDIR}/usr/libexec/reaper"
+    ln -sf /usr/lib/swell/libSwell.colortheme "${DESTDIR}/usr/libexec/reaper"
 }
