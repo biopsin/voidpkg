@@ -12,7 +12,7 @@ distfiles="https://github.com/pekdon/pekwm/releases/download/release-${version}/
 checksum=7becc43b79eab0ff754572852e385435222420385107c881a93ac4dc4ae96065
 
 post_extract() {
-	sed 's|DESTINATION etc|DESTINATION /etc|g' -i data/CMakeLists.txt
+	vsed 's|DESTINATION etc|DESTINATION /etc|g' -i data/CMakeLists.txt
 }
 
 post_install() {
