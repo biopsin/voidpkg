@@ -1,8 +1,8 @@
 # Template file for 'Pale Moon'
 pkgname=palemoon
-version=28.14.2
+version=28.16.0
 revision=1
-uxpver=20201001
+uxpver=20201124
 wrksrc="pale-moon"
 lib32disabled=yes
 hostmakedepends="curl autoconf213 unzip zip pkg-config perl python yasm tar which"
@@ -14,7 +14,7 @@ maintainer="biopsin <biopsin@yahoo.no>"
 license="MPL-2.0, GPL-2.0-or-later, LGPL-2.1-or-later"
 homepage="https://www.palemoon.org"
 distfiles="https://repo.palemoon.org/MoonchildProductions/Pale-Moon/archive/${version}_Release.tar.gz"
-checksum=f1f24e9ecee32eed8070f6180d1a5d0f890ebbf107ce514c28a25f4c62ceb796
+checksum=f62705735a0b12ff33d2c4480147ec951556b72aef3840761bcbaad9fdab17bb
 
 post_extract() {
     curl https://repo.palemoon.org/MoonchildProductions/UXP/archive/RELBASE_${uxpver}.tar.gz -O ${builddir}
@@ -34,9 +34,9 @@ post_configure() {
 		patch -p0 -i $p
 	done
 
-	sed -i 's#xlocale#locale#' ${wrksrc}/platform/intl/icu/source/i18n/digitlst.cpp
-	sed -i 's#DEFAULT_GMAKE_FLAGS += NSS_ALLOW_SSLKEYLOGFILE=1#DEFAULT_GMAKE_FLAGS += NSS_ALLOW_SSLKEYLOGFILE=0#' ${wrksrc}/platform/config/external/nss/Makefile.in
-	sed -i 's#NSS_ALLOW_SSLKEYLOGFILE=1#NSS_ALLOW_SSLKEYLOGFILE=0#' ${wrksrc}/platform/security/nss/lib/ssl/ssl.gyp
+	vsed -i 's#xlocale#locale#' ${wrksrc}/platform/intl/icu/source/i18n/digitlst.cpp
+	vsed -i 's#DEFAULT_GMAKE_FLAGS += NSS_ALLOW_SSLKEYLOGFILE=1#DEFAULT_GMAKE_FLAGS += NSS_ALLOW_SSLKEYLOGFILE=0#' ${wrksrc}/platform/config/external/nss/Makefile.in
+	vsed -i 's#NSS_ALLOW_SSLKEYLOGFILE=1#NSS_ALLOW_SSLKEYLOGFILE=0#' ${wrksrc}/platform/security/nss/lib/ssl/ssl.gyp
 
 }
 
