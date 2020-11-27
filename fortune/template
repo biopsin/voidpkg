@@ -1,0 +1,22 @@
+# Template file for 'fortune'
+pkgname=fortune
+version=1.2
+revision=1
+build_style=gnu-makefile
+short_desc="POSIX implementation of the 'fortune' cookie program"
+maintainer="biopsin <biopsin@teknik.io>"
+license="Public domain"
+homepage="http://dl.fefe.de"
+distfiles="${homepage}/${pkgname}-${version}.tar.bz2"
+checksum=cbb246a500366db39ce035632eb4954e09f1e03b28f2c4688864bfa8661b236a
+
+do_build() {
+	vsed -e 's|/usr/share/games/fortunes|/usr/share/fortunes|g' -i fortune.c
+	make
+}
+
+do_install() {
+	vbin fortune
+	vmkdir usr/share/fortunes
+	vcopy ${FILESDIR}/stephen-wright usr/share/fortunes
+}

@@ -1,0 +1,78 @@
+--- fortune.c	2008-02-15 14:20:30.000000000 +0100
++++ fortune.c	2020-11-27 06:55:34.166233302 +0100
+@@ -29,16 +29,21 @@
+ #include <dirent.h>
+ #include <errno.h>
+ 
++void write_wrapped(int file, const char* str, int len) {
++  ssize_t x = write(file, str, len);
++  (void) x; 
++}
++
+ void carp(const char* msg,const char* filename) {
+   const char* err=strerror(errno);
+-  write(2,msg,strlen(msg));
++  write_wrapped(2,msg,strlen(msg));
+   if (filename) {
+-    write(2," `",2);
+-    write(2,filename,strlen(filename));
+-    write(2,"': ",3);
+-    write(2,err,strlen(err));
++    write_wrapped(2," `",2);
++    write_wrapped(2,filename,strlen(filename));
++    write_wrapped(2,"': ",3);
++    write_wrapped(2,err,strlen(err));
+   }
+-  write(2,".\n",2);
++  write_wrapped(2,".\n",2);
+ }
+ 
+ void die(const char* msg,const char* filename) {
+@@ -76,7 +81,7 @@
+   while (c < map + len &&
+ 	 (*c != '%' || (c<map+len && *(c+1) != '\n') || *(c-1) != '\n'))
+     c++;
+-  write(1,start,c-start);
++  write_wrapped(1,start,c-start);
+ 
+   return c;
+ }
+@@ -124,14 +129,14 @@
+ 	if (errcode != 0) {
+ 	  char errbuf[100];
+ 	  regerror(errcode,&preg,errbuf,sizeof(errbuf));
+-	  write(2,"could not compile regular expression: ",38);
++	  write_wrapped(2,"could not compile regular expression: ",38);
+ 	  die(errbuf,0);
+ 	}
+ 	pmatch[0].rm_so=-1; pmatch[0].rm_eo=-1; m=map-1;
+ 	while ((errcode=regexec(&preg, m+1, 1, pmatch, 0)) == 0) {
+ 	  if (pmatch[0].rm_so != -1) {
+ 	    m=printquote(map, m+pmatch[0].rm_so, len);
+-	    write(1,"%\n",2);
++	    write_wrapped(1,"%\n",2);
+ 	  }
+ 	}
+ 	if (errcode != REG_NOMATCH) {
+@@ -233,7 +233,7 @@
+ 
+       retcode=0;
+ 
+-      chdir(FORTUNEDIR);
++      if (chdir(FORTUNEDIR) != 0);
+       while ((e=readdir(d)) != NULL) {
+ 	struct stat sbuf;
+
+@@ -237,9 +242,9 @@
+ 	} else {
+ 	  if (S_ISREG(sbuf.st_mode)) {
+ 	    if (re != NULL) {
+-	      write(2,"%(",2);
+-	      write(2,e->d_name,strlen(e->d_name));
+-	      write(2,")\n",2);
++	      write_wrapped(2,"%(",2);
++	      write_wrapped(2,e->d_name,strlen(e->d_name));
++	      write_wrapped(2,")\n",2);
+ 	      retcode |= printormatchfortune(e->d_name, re);
+ 	    } else {
+ 	      files=(char *)realloc(files,(fileno+1)*NAME_MAX);
