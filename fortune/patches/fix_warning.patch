@@ -37,7 +37,6 @@
  
  struct option const long_options[] =
  {
-
 @@ -76,7 +81,7 @@
    while (c < map + len &&
  	 (*c != '%' || (c<map+len && *(c+1) != '\n') || *(c-1) != '\n'))
