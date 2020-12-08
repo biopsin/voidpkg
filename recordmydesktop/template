@@ -1,0 +1,18 @@
+# Template file for 'recordmydesktop'
+pkgname=recordmydesktop
+version=0.4.3
+revision=1
+build_style=gnu-configure
+hostmakedepends="autogen automake libtool pkg-config"
+makedepends="zlib-devel alsa-lib-devel libvorbis-devel libtheora-devel libXext-devel
+ libXdamage-devel libSM-devel popt-devel"
+short_desc="A X11 desktop session recorder"
+maintainer="biopsin <biopsin@teknik.io>"
+license="GPL-2.0-or-later"
+homepage="http://recordmydesktop.sourceforge.net/about.php"
+distfiles="https://github.com/vcaputo/$pkgname/archive/$version.tar.gz"
+checksum=4c556d3f72d52d374bc4d72472b2cfcf23a99004e42b3bdccb152e7262300483
+
+pre_configure() {
+	./autogen.sh --prefix=/usr
+}
