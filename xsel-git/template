@@ -1,8 +1,8 @@
 # Template file for 'xsel-git'
 pkgname=xsel-git
-version=160120
+version=160427
 revision=1
-_commit=16e0654e48cccc2bdb39fb66922144c0da0dab23
+_commit=e002f836be4ffa8fc32a1e1e3e7bccc448f27065
 wrksrc="xsel-${_commit}"
 build_style="gnu-configure"
 hostmakedepends="automake"
@@ -12,7 +12,7 @@ maintainer="biopsin <biopsin@gmail.com>"
 license="custom"
 homepage="http://www.vergenet.net/~conrad/software/xsel/"
 distfiles="https://github.com/mckellyln/xsel/archive/${_commit}.tar.gz"
-checksum=234360aa80aec596eb859c281720911dad8bc59da76f65fb37a14f1ddbd171b4
+checksum=4c9cd7eb89e929546466f6e5088ba5364047ad8ce5e4ada02b1d094296763234
 
 pre_configure() {
 	autoreconf -fi
