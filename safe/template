@@ -1,0 +1,25 @@
+# Template file for 'safe'
+pkgname=safe
+version=1.1
+revision=1
+build_style=gnu-makefile
+makedepends="libsodium-devel"
+short_desc="Password protected secret keeper"
+maintainer="biopsin <biopsin@teknik.io>"
+license="Custom"
+homepage="https://z3bra.org/safe"
+distfiles="https://dl.z3bra.org/releases/$pkgname-$version.tar.bz2"
+checksum=c793c79e4af6d4243a1519a73e1314d32c830776dcdfb216977dca25d112706b
+
+pre_build() {
+	sed -i "s|/usr/local|/usr|g" config.mk
+	sed -i "s|man|//share/man|g" config.mk
+}
+
+do_build() {
+	make
+}
+
+post_install() {
+	vlicense LICENSE
+}
