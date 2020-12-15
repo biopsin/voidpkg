@@ -4,7 +4,6 @@ version=201129
 revision=1
 _commit=ad94b41aeb99fbfccd389b6a481e7e572b73608f
 wrksrc="WDL-${_commit}"
-build_style=gnu-configure
 make_build_args="GDK2=1"
 hostmakedepends="pkg-config"
 makedepends="gtk+-devel libXi-devel"
@@ -15,21 +14,12 @@ homepage="https://github.com/justinfrankel/WDL"
 distfiles="https://github.com/justinfrankel/WDL/archive/${_commit}.tar.gz"
 checksum=d9fe50ce5a125cf8dd4e599b2344ac9315be763624a18d5c54c680bda19655b5
 
-do_configure() {
-    pkg-config --cflags --libs gtk+-2.0
-}
-
 do_build() {
     cd ${wrksrc}/WDL/swell
     make ${make_build_args}
     # Create the default colortheme
     make ${make_build_args} libSwell.colortheme
 }
-
-#post_build() {
-#    # Use custom colortheme
-#    cp ${FILESDIR}/* ${wrksrc}/WDL/swell
-#}
 
 do_install() {
     mkdir -p ${DESTDIR}/usr/lib/swell
