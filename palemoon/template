@@ -1,10 +1,9 @@
 # Template file for 'Pale Moon'
 pkgname=palemoon
-version=28.16.0
+version=28.17.0
 revision=1
-uxpver=20201124
+uxpver=20201218
 wrksrc="pale-moon"
-lib32disabled=yes
 hostmakedepends="curl autoconf213 unzip zip pkg-config perl python yasm tar which"
 makedepends=" python-devel libatomic-devel gtk+-devel libSM-devel libXt-devel
  alsa-lib-devel ffmpeg-devel libvpx-devel libpng-devel"
@@ -14,7 +13,9 @@ maintainer="biopsin <biopsin@yahoo.no>"
 license="MPL-2.0, GPL-2.0-or-later, LGPL-2.1-or-later"
 homepage="https://www.palemoon.org"
 distfiles="https://repo.palemoon.org/MoonchildProductions/Pale-Moon/archive/${version}_Release.tar.gz"
-checksum=f62705735a0b12ff33d2c4480147ec951556b72aef3840761bcbaad9fdab17bb
+checksum=4842fdf20d031a42b6b9e652d1e03035553f4f6de97c1b1c50744e1686fdff98
+python_version=2
+lib32disabled=yes
 
 post_extract() {
     curl https://repo.palemoon.org/MoonchildProductions/UXP/archive/RELBASE_${uxpver}.tar.gz -O ${builddir}
@@ -22,43 +23,44 @@ post_extract() {
     rm RELBASE_${uxpver}.tar.gz
 }
 
+do_patch() {
+    for p in ${FILESDIR}/*.patch; do
+        patch -p0 -i $p
+    done
+}
+
 do_configure() {
-	cp "${FILESDIR}/mozconfig" "${wrksrc}/.mozconfig"
-	mkdir -p /usr/lib/palemoon
-	export LDFLAGS+=" -Wl,-rpath=/usr/lib/palemoon"
-	export MOZ_MAKE_FLAGS="${makejobs}"
+    cp "${FILESDIR}/mozconfig" "${wrksrc}/.mozconfig"
+    mkdir -p /usr/lib/palemoon
+    export LDFLAGS+=" -Wl,-rpath=/usr/lib/palemoon"
+    export MOZ_MAKE_FLAGS="${makejobs}"
 }
 
 post_configure() {
-	for p in ${FILESDIR}/*.patch; do
-		patch -p0 -i $p
-	done
-
-	vsed -i 's#xlocale#locale#' ${wrksrc}/platform/intl/icu/source/i18n/digitlst.cpp
-	vsed -i 's#DEFAULT_GMAKE_FLAGS += NSS_ALLOW_SSLKEYLOGFILE=1#DEFAULT_GMAKE_FLAGS += NSS_ALLOW_SSLKEYLOGFILE=0#' ${wrksrc}/platform/config/external/nss/Makefile.in
-	vsed -i 's#NSS_ALLOW_SSLKEYLOGFILE=1#NSS_ALLOW_SSLKEYLOGFILE=0#' ${wrksrc}/platform/security/nss/lib/ssl/ssl.gyp
-
+    vsed 's|xlocale|locale|' -i platform/intl/icu/source/i18n/digitlst.cpp
+    vsed 's|NSS_ALLOW_SSLKEYLOGFILE=1|NSS_ALLOW_SSLKEYLOGFILE=0|' -i platform/config/external/nss/Makefile.in
+    vsed 's|enable_sslkeylogfile==1|enable_sslkeylogfile==0|' -i platform/security/nss/lib/ssl/ssl.gyp
 }
 
 do_build() {
-	rm -f ${wrksrc}/old-configure
-	./mach build
+    rm -f ${wrksrc}/old-configure
+    ./mach build
 }
 
 do_install() {
-	DESTDIR="$DESTDIR" ./mach install
+    DESTDIR="$DESTDIR" ./mach install
 
-	for i in 16x16 32x32 48x48; do
-		vinstall ${wrksrc}/palemoon/branding/unstable/default${i%x*}.png 644 \
-			usr/share/icons/hicolor/${i}/apps palemoon.png
-	done
+    for i in 16x16 32x32 48x48; do
+        vinstall ${wrksrc}/palemoon/branding/unstable/default${i%x*}.png 644 \
+            usr/share/icons/hicolor/${i}/apps palemoon.png
+    done
 
-	vinstall ${wrksrc}/palemoon/branding/official/palemoon.desktop 644 usr/share/applications
+    vinstall ${wrksrc}/palemoon/branding/official/palemoon.desktop 644 usr/share/applications
 
-	# Don't want the development or bundle stuff
-	rm -rf ${DESTDIR}/usr/{include,lib/palemoon-devel,share/idl}
-	rm -rf ${DESTDIR}/usr/lib/palemoon/browser/searchplugins
+    # Don't want the development or bundle stuff
+    rm -rf ${DESTDIR}/usr/{include,lib/palemoon-devel,share/idl}
+    rm -rf ${DESTDIR}/usr/lib/palemoon/browser/{searchplugins,defaults}
 
-	# https://bugzilla.mozilla.org/show_bug.cgi?id=658850
-	ln -sf palemoon ${DESTDIR}/usr/lib/palemoon/palemoon-bin
+    # https://bugzilla.mozilla.org/show_bug.cgi?id=658850
+    ln -sf palemoon ${DESTDIR}/usr/lib/palemoon/palemoon-bin
 }
