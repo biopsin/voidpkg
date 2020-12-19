@@ -13,13 +13,14 @@ homepage="http://tools.suckless.org/tabbed/"
 distfiles="https://github.com/samedamci/tabbed/archive/${_commit}.tar.gz"
 checksum=9bea53d95d82c1346712fa0e63d6b35602e45c2e6e3e64590693fb136aacd597
 
-pre_build() {
-	sed 's/-O2 //g' -i config.mk
-	sed 's/^CPPFLAGS =/override CPPFLAGS +=/g' -i config.mk
-	sed 's/^CFLAGS =/override CFLAGS +=/g' -i config.mk
-	sed 's/^LDFLAGS =/override LDFLAGS +=/g' -i config.mk
+post_extract() {
+    cp -f ${FILESDIR}/config.def.h .
+    vsed 's|^CPPFLAGS =|override CPPFLAGS +=|' -i config.mk
+    vsed 's|^CFLAGS =|override CFLAGS +=|' -i config.mk
+    vsed 's|^LDFLAGS =|override LDFLAGS +=|' -i config.mk
 }
 
 post_install() {
-	vlicense LICENSE
+    vlicense LICENSE
 }
+
