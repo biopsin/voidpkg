@@ -4,8 +4,8 @@ version=0.7.9
 revision=1
 build_style=meson
 build_helper="gir"
-configure_args="-Dc_args=-O2 -Dtests=false -Dman=false -Dgtk_doc=false
- -Ddocbook_docs=disabled -Dintrospection=$(vopt_if gir enabled disabled)"
+configure_args="-Dtests=false -Dintrospection=$(vopt_if gir enabled disabled)"
+ -Dman=false -Dgtk_doc=false -Ddocbook_docs=disabled -Dc_args=-O2"
 hostmakedepends="pkg-config glib-devel"
 makedepends="libglib-devel libpng-devel gdk-pixbuf-devel"
 short_desc="Desktop notification library"
