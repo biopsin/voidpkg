@@ -1,6 +1,6 @@
 # Template file for 'p7zip'
 pkgname=p7zip
-version=17.02
+version=17.03
 revision=1
 #wrksrc="${pkgname}_${version}"
 hostmakedepends="yasm nasm"
@@ -9,7 +9,7 @@ maintainer="biopsin <biopsin@teknik.io>"
 license="LGPL-2.1-or-later"
 homepage="http://p7zip.sourceforge.net/"
 distfiles="https://github.com/szcnick/${pkgname}/archive/v${version}/7z_linux_x86_64.zip"
-checksum=c114a623b01f76036224aeb9f9c103a8fc97d2f317bde15f2c16b94d9aacf4c7
+checksum=10fb1cac046c36bf7b61e67702f47fd02a26e4aeec50f158bc41d88668852dfb
 
 do_configure() {
 	case "$XBPS_TARGET_MACHINE" in
