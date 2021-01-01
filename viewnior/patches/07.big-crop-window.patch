@@ -1,0 +1,11 @@
+--- a/src/vnr-crop.c	2018-05-13 11:40:40.000000000 +0200
++++ b/src/vnr-crop.c	2021-01-01 15:41:58.982216639 +0100
+@@ -122,7 +122,7 @@
+     width = crop->vnr_win->current_image_width;
+     height = crop->vnr_win->current_image_height;
+ 
+-    vnr_tools_fit_to_size_double(&height, &width, 400,400);
++    vnr_tools_fit_to_size_double(&height, &width, 1920,1280);
+     crop->width = width;
+     crop->height = height;
+     crop->zoom = ( width/crop->vnr_win->current_image_width
