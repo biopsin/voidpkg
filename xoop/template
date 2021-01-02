@@ -12,14 +12,15 @@ license="MIT License"
 homepage="https://mcol.xyz/code/xoop/file/readme.html"
 
 do_extract() {
-	git clone https://mcol.xyz/code/xoop ${wrksrc}
+    git clone https://mcol.xyz/code/xoop ${wrksrc}
+    vsed -e "s|/local||" -e "s|/man|/share/man|" -i makefile
 }
 
-do_build(){
-	CFLAGS=${CFLAGS}; make
+do_build() {
+    make ${makejobs}
 }
 
-do_install() {
-	vbin xoop
-	vlicense LICENSE
+post_install() {
+    vlicense LICENSE
 }
+
