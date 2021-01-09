@@ -1,0 +1,22 @@
+--- ftpfs.c	
++++ ftpfs.c	
+@@ -607,6 +607,8 @@ static int finish_write_thread(struct ftpfs_file *fh)
+ 
+ 
+ static void free_ftpfs_file(struct ftpfs_file *fh) {
++  buf_free(&fh->buf);
++  buf_free(&fh->stream_buf);
+   if (fh->write_conn)
+     curl_easy_cleanup(fh->write_conn);
+   g_free(fh->full_path);
+
+
+@@ -615,6 +615,8 @@ static void free_ftpfs_file(struct ftpfs
+   sem_destroy(&fh->data_need);
+   sem_destroy(&fh->data_written);
+   sem_destroy(&fh->ready);
++  if (fh->buf.size) { buf_free(&fh->buf); }
++  if (fh->stream_buf.size) { buf_free(&fh->stream_buf); }
+   free(fh);
+ }
+ 
