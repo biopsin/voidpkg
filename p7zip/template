@@ -8,7 +8,7 @@ maintainer="biopsin <biopsin@teknik.io>"
 license="LGPL-2.1-or-later"
 homepage="http://p7zip.sourceforge.net/"
 distfiles="https://github.com/szcnick/p7zip/archive/v${version}tar.gz"
-checksum=10fb1cac046c36bf7b61e67702f47fd02a26e4aeec50f158bc41d88668852dfb
+checksum=bb4b9b21584c0e076e0b4b2705af0dbe7ac19d378aa7f09a79da33a5b3293187
 
 do_configure() {
 	case "$XBPS_TARGET_MACHINE" in
