@@ -2,13 +2,12 @@
 pkgname=p7zip
 version=17.03
 revision=1
-#wrksrc="${pkgname}_${version}"
 hostmakedepends="yasm nasm"
 short_desc="Command-line version of the 7zip compressed file archive"
 maintainer="biopsin <biopsin@teknik.io>"
 license="LGPL-2.1-or-later"
 homepage="http://p7zip.sourceforge.net/"
-distfiles="https://github.com/szcnick/${pkgname}/archive/v${version}/7z_linux_x86_64.zip"
+distfiles="https://github.com/szcnick/p7zip/archive/v${version}tar.gz"
 checksum=10fb1cac046c36bf7b61e67702f47fd02a26e4aeec50f158bc41d88668852dfb
 
 do_configure() {
@@ -17,8 +16,8 @@ do_configure() {
 		x86_64*) cp makefile.linux_amd64_asm makefile.machine;;
 		*) cp makefile.linux_any_cpu_gcc_4.X makefile.machine;;
 	esac
-	vsed -e "s,g++,${CXX}," -i makefile.machine
-	vsed -e "s,gcc,${CC}," -i makefile.machine
+	vsed -i "s|g++|${CXX}|" makefile.machine
+	vsed -i "s|cc|${CC}|" makefile.machine
 }
 
 do_build() {
