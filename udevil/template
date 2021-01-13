@@ -1,7 +1,7 @@
 # Template file for 'udevil'
 pkgname=udevil
 version=0.4.4
-revision=4
+revision=5
 build_style=gnu-configure
 configure_args="--disable-systemd"
 conf_files="/etc/udevil/udevil.conf"
@@ -14,3 +14,7 @@ homepage="http://ignorantguru.github.io/udevil/"
 distfiles="https://github.com/IgnorantGuru/udevil/archive/${version}.tar.gz"
 checksum=ad2fd8375bd62622718a04235e9772119459089938dbb78e657955e595822b7c
 patch_args="-p1"
+
+post_install() {
+	rm -rf ${DESTDIR}/usr/share/locale
+}
