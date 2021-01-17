@@ -1,0 +1,38 @@
+--- main.c	2019-02-22 12:54:48.000000000 +0100
++++ main.c	2021-01-16 14:17:21.799059175 +0100
+@@ -82,7 +82,7 @@
+ "  -h                   Print help.\n" \
+ "\n" \
+ "Options:\n" \
+-"  -S                   List windows in stacking order (bottom to top).\n" \
++"  -L                   List windows in stacking order (bottom to top).\n" \
+ "  -i                   Interpret <WIN> as a numerical window ID.\n" \
+ "  -p                   Include PIDs in the window list. Very few\n" \
+ "                       X applications support this feature.\n" \
+@@ -270,13 +270,13 @@
+         }
+     }
+ 
+-    while ((opt = getopt(argc, argv, "FGVvhSlupidjmxa:r:s:c:t:w:k:o:n:g:e:y:b:z:E:N:I:T:R:Y:")) != -1) {
++    while ((opt = getopt(argc, argv, "FGVvhLlupidjmxa:r:s:c:t:w:k:o:n:g:e:y:b:z:E:N:I:T:R:Y:")) != -1) {
+         missing_option = 0;
+         switch (opt) {
+             case 'F':
+                 options.full_window_title_match = 1;
+                 break;
+-            case 'S':
++            case 'L':
+                 options.stacking_order = 1;
+                 break;
+             case 'G':
+--- wmctrl.1	2019-02-22 12:54:48.000000000 +0100
++++ wmctrl.1	2021-01-16 14:18:32.095057090 +0100
+@@ -226,7 +226,7 @@
+ action.
+ 
+ .TP
+-.B \-S
++.B \-L
+ List windows in stacking order (bottom to top).
+ 
+ .TP

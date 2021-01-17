@@ -1,0 +1,165 @@
+Author: Jakub Nowak <jakub.jakub.nowak@gmail.com>
+
+--- main.c
++++ main.c
+@@ -85,12 +85,15 @@ Free Software Foundation, Inc., 675 Mass
+ "  -G                   Include geometry in the window list.\n" \
+ "  -x                   Include WM_CLASS in the window list or\n" \
+ "                       interpret <WIN> as the WM_CLASS name.\n" \
++"  -M                   Include client machine name in the window list.\n" \
++"  -W                   Include title in the window list.\n" \
+ "  -u                   Override auto-detection and force UTF-8 mode.\n" \
+ "  -F                   Modifies the behavior of the window title matching\n" \
+ "                       algorithm. It will match only the full window title\n" \
+ "                       instead of a substring, when this option is used.\n" \
+ "                       Furthermore it makes the matching case sensitive.\n" \
+ "  -v                   Be verbose. Useful for debugging.\n" \
++"  -S <SEP>             Use <SEP> as a field separator instead of tab character.\n" \
+ "  -w <WA>              Use a workaround. The option may appear multiple\n" \
+ "                       times. List of available workarounds is given below.\n" \
+ "\n" \
+@@ -226,6 +229,8 @@ static Window get_active_window(Display
+ static struct {
+     int verbose;
+     int force_utf8;
++    int show_title;
++    int show_client_machine;
+     int show_class;
+     int show_pid;
+     int show_geometry;
+@@ -235,6 +240,7 @@ static struct {
+     int wa_desktop_titles_invalid_utf8;
+     char *param_window;
+     char *param;
++    char separator;
+ } options;
+ 
+ static gboolean envir_utf8;
+@@ -247,6 +253,7 @@ int main (int argc, char **argv) { /* {{
+     Display *disp;
+ 
+     memset(&options, 0, sizeof(options)); /* just for sure */
++    options.separator = '\t';
+     
+     /* necessary to make g_get_charset() and g_locale_*() work */
+     setlocale(LC_ALL, "");
+@@ -270,9 +277,22 @@
+         }
+     }
+ 
+-    while ((opt = getopt(argc, argv, "FGVvhLlupidjmxa:r:s:c:t:w:k:o:n:g:e:y:b:z:E:N:I:T:R:Y:")) != -1) {
++    while ((opt = getopt(argc, argv, "FGVvhLlupidjmxMWS:a:r:s:c:t:w:k:o:n:g:e:y:b:z:E:N:I:T:R:Y:")) != -1) {
+         missing_option = 0;
+         switch (opt) {
++            case 'W':
++                options.show_title = 1;
++                break;
++            case 'M':
++                options.show_client_machine = 1;
++                break;
++            case 'S':
++                if (strlen(optarg) > 1) {
++                    fprintf(stderr, "Separator must be a single character.");
++                    return EXIT_FAILURE;
++                }
++                options.separator = optarg[0];
++                break;
+             case 'F':
+                 options.full_window_title_match = 1;
+                 break;
+@@ -1215,10 +1235,13 @@ static int list_desktops (Display *disp)
+     /* print the list */
+     for (i = 0; i < *num_desktops; i++) {
+         gchar *out = get_output_str(names[i], names_are_utf8);
+-        printf("%-2d %c DG: %-*s  VP: %-*s  WA: %-*s  %s\n", i, i == *cur_desktop ? '*' : '-',
++        printf("%d%c%c%cDG: %-*s%cVP: %-*s%cWA: %-*s%c%s\n", i, options.separator, i == *cur_desktop ? '*' : '-', options.separator,
+                 longest_str(desktop_geometry_str), desktop_geometry_str[i], 
++                    options.separator,
+                 longest_str(desktop_viewport_str), desktop_viewport_str[i], 
++                    options.separator,
+                 longest_str(desktop_workarea_str), desktop_workarea_str[i], 
++                    options.separator,
+                 out ? out : "N/A");
+         g_free(out);
+     }
+@@ -1279,22 +1302,11 @@ static int list_windows (Display *disp)
+     Window *client_list;
+     unsigned long client_list_size;
+     int i;
+-    int max_client_machine_len = 0;
+     
+     if ((client_list = get_client_list(disp, &client_list_size)) == NULL) {
+         return EXIT_FAILURE; 
+     }
+     
+-    /* find the longest client_machine name */
+-    for (i = 0; i < client_list_size / sizeof(Window); i++) {
+-        gchar *client_machine;
+-        if ((client_machine = get_property(disp, client_list[i],
+-                XA_STRING, "WM_CLIENT_MACHINE", NULL))) {
+-            max_client_machine_len = strlen(client_machine);    
+-        }
+-        g_free(client_machine);
+-    }
+-    
+     /* print the list */
+     for (i = 0; i < client_list_size / sizeof(Window); i++) {
+         gchar *title_utf8 = get_window_title(disp, client_list[i]); /* UTF8 */
+@@ -1330,23 +1342,28 @@ static int list_windows (Display *disp)
+       
+         /* special desktop ID -1 means "all desktops", so we 
+            have to convert the desktop value to signed long */
+-        printf("0x%.8lx %2ld", client_list[i], 
++        printf("%#.8lx%c%ld", client_list[i], options.separator,
+                 desktop ? (signed long)*desktop : 0);
+         if (options.show_pid) {
+-           printf(" %-6lu", pid ? *pid : 0);
++           printf("%c%lu", options.separator, pid ? *pid : 0);
+         }
+         if (options.show_geometry) {
+-           printf(" %-4d %-4d %-4d %-4d", x, y, wwidth, wheight);
++           printf("%c%d %d %d %d", options.separator, x, y, wwidth, wheight);
+         }
+ 		if (options.show_class) {
+-		   printf(" %-20s ", class_out ? class_out : "N/A");
++		   printf("%c%s", options.separator, class_out ? class_out : "N/A");
+ 		}
+-
+-        printf(" %*s %s\n",
+-              max_client_machine_len,
+-              client_machine ? client_machine : "N/A",
++        if (options.show_client_machine) {
++           printf("%c%s", options.separator, client_machine ? client_machine : "N/A");
++        }
++        if (options.show_title) {
++           printf("%c%s", options.separator, 
+               title_out ? title_out : "N/A"
+ 		);
++        }
++
++        printf("\n");
++
+         g_free(title_utf8);
+         g_free(title_out);
+         g_free(desktop);
+--- wmctrl.1
++++ wmctrl.1
+@@ -250,6 +250,18 @@ Use workarounds specified in the argumen
+ .B \-x                   
+ Include WM_CLASS in the window list or interpret <WIN> as the WM_CLASS name.
+ 
++.TP
++.B \-M
++Include client machine name in the window list.
++
++.TP
++.B \-W
++Include window title in the window list.
++
++.TP
++.BI \-S " <SEP>"
++Change separator to <SEP> instead of tab character.
++
+ 
+ .SH ARGUMENTS
+ 
