@@ -1,7 +1,7 @@
 # Template file for 'wmctrl-git'
 pkgname=wmctrl-git
-version=20190222
-revision=3
+version=190222
+revision=1
 _githash=24f629566a98e47f3963f261f9b2460987ece950
 wrksrc="wmctrl-${_githash}"
 build_style=gnu-configure
