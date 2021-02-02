@@ -1,8 +1,8 @@
 # Template file for 'Pale Moon'
 pkgname=palemoon
-version=28.17.0
+version=29.0.0
 revision=1
-uxpver=20201218
+_uxpver=20210202
 wrksrc="pale-moon"
 hostmakedepends="curl autoconf213 unzip zip pkg-config perl python yasm tar which"
 makedepends=" python-devel libatomic-devel gtk+-devel libSM-devel libXt-devel
@@ -18,9 +18,9 @@ python_version=2
 lib32disabled=yes
 
 post_extract() {
-    curl https://repo.palemoon.org/MoonchildProductions/UXP/archive/RELBASE_${uxpver}.tar.gz -O ${builddir}
-    tar --strip-components=1 -xvzf RELBASE_${uxpver}.tar.gz -C platform/
-    rm RELBASE_${uxpver}.tar.gz
+    curl https://repo.palemoon.org/MoonchildProductions/UXP/archive/RELBASE_${_uxpver}.tar.gz -O ${builddir}
+    tar --strip-components=1 -xvzf RELBASE_${_uxpver}.tar.gz -C platform/
+    rm RELBASE_${_uxpver}.tar.gz
 }
 
 do_patch() {
