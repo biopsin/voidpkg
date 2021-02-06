@@ -3,7 +3,7 @@ pkgname=pekwm
 version=0.1.18
 revision=1
 build_style=cmake
-makedepends="libXrender-devel libXft-devel fontconfig-devel"
+makedepends="libXrender-devel libXft-devel"
 short_desc="Window manager based on aewm++"
 maintainer="biopsin <biopsin@teknik.io>"
 license="GPL-2-or-later"
@@ -12,7 +12,8 @@ distfiles="https://github.com/pekdon/pekwm/releases/download/release-${version}/
 checksum=7becc43b79eab0ff754572852e385435222420385107c881a93ac4dc4ae96065
 
 post_extract() {
-	vsed 's|DESTINATION etc|DESTINATION /etc|g' -i data/CMakeLists.txt
+	vsed 's|${CMAKE_INSTALL_PREFIX}/etc|/etc|' -i CMakeLists.txt
+	vsed 's| etc| /etc|g' -i data/CMakeLists.txt
 }
 
 post_install() {
