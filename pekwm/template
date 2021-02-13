@@ -11,6 +11,20 @@ homepage="https://www.pekwm.org/projects/pekwm"
 distfiles="https://github.com/pekdon/pekwm/releases/download/release-${version}/${pkgname}-${version}.tar.gz"
 checksum=7becc43b79eab0ff754572852e385435222420385107c881a93ac4dc4ae96065
 
+conf_files="
+	/etc/pekwm/autoproperties
+	/etc/pekwm/autoproperties_typerules
+	/etc/pekwm/config
+	/etc/pekwm/config_system
+	/etc/pekwm/keys
+	/etc/pekwm/menu
+	/etc/pekwm/config
+	/etc/pekwm/mouse
+	/etc/pekwm/mouse_click
+	/etc/pekwm/mouse_sloppy
+	/etc/pekwm/mouse_system
+	/etc/pekwm/start
+	/etc/pekwm/vars"
 
 post_extract() {
 	vsed 's|${CMAKE_INSTALL_PREFIX}/etc|/etc|' -i CMakeLists.txt
