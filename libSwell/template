@@ -1,9 +1,8 @@
 # Template file for 'libSwell'
 pkgname=libSwell
-version=210122
+version=210211
 revision=1
-_commit=0c0ee37554dde5452f6bca7b935772bb8e135afc
-wrksrc="WDL-${_commit}"
+wrksrc="WDL-master"
 make_build_args="GDK2=1"
 hostmakedepends="pkg-config"
 makedepends="gtk+-devel libXi-devel"
@@ -11,8 +10,8 @@ short_desc="WDL is a set of simple C++ classes"
 maintainer="biopsin <biopsin@protonmail.com>"
 license="GPL-2-or-later"
 homepage="https://github.com/justinfrankel/WDL"
-distfiles="https://github.com/justinfrankel/WDL/archive/${_commit}.tar.gz"
-checksum=0faad072080b40797d6d95549cf9e4c5eb0a11f3b47002478984486191c3641c
+distfiles="https://github.com/justinfrankel/WDL/archive/master.zip"
+checksum=3092130451f21a038c474e6425cb58ee4c8c2152d7216e87161af6b8b2a1a8ef
 
 do_build() {
     cd ${wrksrc}/WDL/swell
