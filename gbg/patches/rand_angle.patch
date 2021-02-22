@@ -4,7 +4,9 @@
      // Don't operate on a full size image, gradient production is slow
      unsigned int img_height = height / 4;
      unsigned int img_width = width / 4;
-+	unsigned int img_angle = (double) (rand() % 180);
+
+     // Randomize angle on each run (±180°)
++	signed int img_angle = (double) (rand() % 180);
  
      rgb color1;
      rgb color2;
