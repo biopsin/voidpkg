@@ -4,7 +4,6 @@ version=1.6.1
 revision=1
 build_style=gnu-makefile
 make_use_env=yes
-make_build_target="dunst dunstify"
 hostmakedepends="perl pkg-config"
 makedepends="gtk+-devel libXScrnSaver-devel libXinerama-devel libXrandr-devel
  libnotify-devel"
@@ -17,12 +16,10 @@ distfiles="https://github.com/dunst-project/dunst/archive/v${version}.tar.gz"
 checksum=cc7d801575f75e92b18d46ee5d3df80aaf331c88b83ec6caabbecf8636310e13
 
 post_extract() {
-	vsed 's|#SYSTEMD ?= 0|SYSTEMD ?= 0|'
-	vsed 's|# WAYLAND ?= 0|WAYLAND ?= 0|'
+	vsed 's|#SYSTEMD ?= 0|SYSTEMD ?= 0|' -i config.mk
+	vsed 's|# WAYLAND ?= 0|WAYLAND ?= 0|' -i config.mk
 }
 
 post_install() {
 	vlicense LICENSE
-	vbin dunstctl
-	vbin dunstify
 }
