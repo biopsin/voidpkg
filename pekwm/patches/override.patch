@@ -1,0 +1,37 @@
+From c347cef5bc5f47e50a9fd2baa4222baefc0ee0a6 Mon Sep 17 00:00:00 2001
+From: biopsin <biopsin@teknik.io>
+Date: Wed, 24 Feb 2021 06:57:16 +0000
+Subject: [PATCH] Add option to allow SYSCONFIG override Update: se faq.md and
+ overview.md
+
+Update: Conform to cmake  GNUInstallDirs and install spec.
+---
+ CMakeLists.txt      |  2 +-
+ data/CMakeLists.txt |  2 +-
+ doc/faq.md          |  9 ++++++++-
+ doc/overview.md     | 13 +++++++------
+ 4 files changed, 17 insertions(+), 9 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 416331c..8f27644 100644
+--- CMakeLists.txt
++++ CMakeLists.txt
+@@ -116,7 +116,7 @@ add_definitions(-DVERSION="${pekwm_VERSION}"
+   -DFEATURES="${pekwm_FEATURES}"
+   -DBINDIR="${CMAKE_INSTALL_PREFIX}/bin"
+   -DDATADIR="${CMAKE_INSTALL_PREFIX}/share"
+-  -DSYSCONFDIR="${CMAKE_INSTALL_PREFIX}/etc/pekwm")
++  -DSYSCONFDIR="${CMAKE_INSTALL_SYSCONFDIR}/pekwm")
+ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH True)
+ 
+ # Subdirectories
+diff --git a/data/CMakeLists.txt b/data/CMakeLists.txt
+index 437db5c..60ea861 100644
+--- data/CMakeLists.txt
++++ data/CMakeLists.txt
+@@ -17,4 +17,4 @@ install(FILES
+   panel
+   start
+   vars
+-  DESTINATION etc/pekwm/)
++  TYPE SYSCONF)
