@@ -5,31 +5,17 @@ revision=1
 _commit=6260a4d2c7b8020c212a65748a5867861c24373b
 wrksrc="pekwm-${_commit}"
 build_style=cmake
-configure_args="-DCMAKE_INSTALL_PREFIX=/usr -DSYSCONFDIR=/etc
+configure_args="-DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_SYSCONFDIR=/etc/pekwm
  -DENABLE_SHAPE=OFF -DENABLE_XINERAMA=OFF -DENABLE_RANDR=OFF -DENABLE_XFT=ON
  -DENABLE_IMAGE_XPM=OFF -DENABLE_IMAGE_JPEG=OFF -DENABLE_IMAGE_PNG=OFF"
 makedepends="libXft-devel libXrender-devel"
+conf_files="/etc/pekwm/*"
 short_desc="Window manager based on aewm++"
 maintainer="biopsin <biopsin@teknik.io>"
 license="GPL-2.0-or-later"
 homepage="https://www.pekwm.org/projects/pekwm"
 distfiles="https://github.com/pekdon/pekwm/archive/${_commit}.tar.gz"
 checksum=6734b2aed6953b5daedc1d4f508006b7da41e6162a63f2f4da1a6da002f77901
-
-conf_files="
-    /etc/pekwm/autoproperties
-    /etc/pekwm/autoproperties_typerules
-    /etc/pekwm/config
-    /etc/pekwm/config_system
-    /etc/pekwm/keys
-    /etc/pekwm/menu
-    /etc/pekwm/config
-    /etc/pekwm/mouse
-    /etc/pekwm/mouse_click
-    /etc/pekwm/mouse_sloppy
-    /etc/pekwm/mouse_system
-    /etc/pekwm/start
-    /etc/pekwm/vars"
 
 post_install() {
     rm -rf ${DESTDIR}/usr/share/pekwm/themes/default
