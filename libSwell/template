@@ -1,8 +1,9 @@
 # Template file for 'libSwell'
 pkgname=libSwell
-version=210211
+version=210219
 revision=1
-wrksrc="WDL-master"
+_commit="e6f418d13f4b07621886b9e50412bb0a167fefcf"
+wrksrc="WDL-${_commit}"
 make_build_args="GDK2=1"
 hostmakedepends="pkg-config"
 makedepends="gtk+-devel libXi-devel"
@@ -10,8 +11,8 @@ short_desc="WDL is a set of simple C++ classes"
 maintainer="biopsin <biopsin@protonmail.com>"
 license="GPL-2-or-later"
 homepage="https://github.com/justinfrankel/WDL"
-distfiles="https://github.com/justinfrankel/WDL/archive/master.zip"
-checksum=3092130451f21a038c474e6425cb58ee4c8c2152d7216e87161af6b8b2a1a8ef
+distfiles="${homepage}/archive/${_commit}.zip"
+checksum=add83233f83b26daaf1147bc33bbd0d1b256d05ae143261d280af782b7261be1
 
 do_build() {
     cd ${wrksrc}/WDL/swell
@@ -21,11 +22,11 @@ do_build() {
 }
 
 do_install() {
-    mkdir -p ${DESTDIR}/usr/lib/swell
-    cp ${wrksrc}/WDL/swell/{libSwell.so,libSwell.colortheme} ${DESTDIR}/usr/lib/swell
+    vmkdir usr/lib/swell
+    cp ${wrksrc}/WDL/swell/{libSwell.so,libSwell.colortheme} "${DESTDIR}/usr/lib/swell"
 
-    # Override prebuilt swell
     vmkdir usr/libexec/reaper
     ln -sf /usr/lib/swell/libSwell.so "${DESTDIR}/usr/libexec/reaper"
     ln -sf /usr/lib/swell/libSwell.colortheme "${DESTDIR}/usr/libexec/reaper"
 }
+
