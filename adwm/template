@@ -3,11 +3,11 @@ pkgname=adwm
 version=0.7.11
 revision=1
 build_style=gnu-configure
-configure_args="--disable-startup-notification --with-x"
-hostmakedepends="autogen autoconf automake gettext-devel
- libtool pkg-config asciidoc"
-makedepends="libXdamage-devel libXcomposite-devel cairo-devel pango-devel
- libXpm-devel libjpeg-turbo-devel libXft-devel libSM-devel"
+configure_args="--disable-startup-notification --with-x
+ --disable-libpng --disable-libjpeg --disable-libsvg"
+hostmakedepends="autogen autoconf automake pkg-config gettext libtool asciidoc"
+makedepends="libXdamage-devel libXcomposite-devel libSM-devel cairo-devel pango-devel
+ libXpm-devel libXft-devel"
 short_desc="Full EWMH window manager fork of Echinus"
 maintainer="biopsin <biopsin@teknik.io>"
 license="GPL-3.0-or-later"
