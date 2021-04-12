@@ -1,0 +1,36 @@
+--- a/meson.build	2021-03-27 02:54:29.000000000 +0100
++++ b/meson.build	2021-04-11 13:28:00.637360011 +0200
+@@ -577,7 +577,9 @@
+   xfixes_dep     = dependency('xfixes', required: false)
+   xcomposite_dep = dependency('xcomposite', required: false)
+   fontconfig_dep = dependency('fontconfig', fallback: ['fontconfig', 'fontconfig_dep'])
+-  atkbridge_dep  = dependency('atk-bridge-2.0', version: at_spi2_atk_req)
++  if atkbridge_enabled
++    atkbridge_dep  = dependency('atk-bridge-2.0', version: at_spi2_atk_req)
++  endif
+ 
+   x11_pkgs = ['fontconfig', 'x11', 'xext', 'xi', 'xrandr']
+ 
+@@ -594,7 +596,9 @@
+     x11_pkgs += ['xdamage']
+   endif
+ 
+-  atk_pkgs += ['atk-bridge-2.0']
++  if atkbridge_dep.found()
++    atk_pkgs += ['atk-bridge-2.0']
++  endif
+ 
+   cdata.set('HAVE_XDAMAGE', xdamage_dep.found() ? 1 : false)
+   cdata.set('HAVE_XCURSOR', xcursor_dep.found() ? 1 : false)
+
+--- a/meson_options.txt	2021-02-24 20:13:20.000000000 +0100
++++ b/meson_options.txt	2021-04-11 13:28:01.837360123 +0200
+@@ -1,6 +1,8 @@
+ # GDK backends
+ option('x11_backend', type: 'boolean', value: true,
+   description : 'Enable the X11 gdk backend (only when building on Unix)')
++option('atk_bridge', type: 'boolean', value: true,
++  description : 'Enable the ATK to D-Bus at-spi bridge (only when building on Unix)')
+ option('wayland_backend', type: 'boolean', value: true,
+   description : 'Enable the wayland gdk backend (only when building on Unix except for macOS)')
+ option('broadway_backend', type: 'boolean', value: false,

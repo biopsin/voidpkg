@@ -1,0 +1,72 @@
+# Template file for 'gtk+3'
+# Revbump gtk-layer-shell when updating, otherwise it presents a warning message
+pkgname=gtk+3
+version=3.24.28
+revision=1
+wrksrc="gtk+-${version}"
+build_style=meson
+build_helper="gir"
+configure_args="-Dx11_backend=$(vopt_if x11 true false) -Dwayland_backend=$(vopt_if wayland true false) 
+ -Dbroadway_backend=$(vopt_if broadway true false) -Dcloudproviders=$(vopt_if cloudproviders true false)
+ -Dprint_backends=$(vopt_if print auto file) -Dxinerama=$(vopt_if xinerama yes no)
+ -Dcolord=$(vopt_if colord yes no) -Dintrospection=$(vopt_if gir true false)
+ -Ddemos=false -Dexamples=false -Dtests=false -Dinstalled_tests=false"
+conf_files="/etc/gtk-3.0/im-multipress.conf"
+hostmakedepends="gettext-devel glib-devel gtk-update-icon-cache perl pkg-config
+ $(vopt_if wayland 'wayland-devel wayland-protocols')"
+makedepends="at-spi2-atk-devel gdk-pixbuf-devel libepoxy-devel pango-devel iso-codes
+ $(vopt_if colord 'colord-devel') $(vopt_if print 'cups-devel')
+ $(vopt_if wayland 'libxkbcommon-devel wayland-devel wayland-protocols MesaLib-devel')
+ $(vopt_if x11 'libXcursor-devel libXdamage-devel libXext-devel libXi-devel libXrandr-devel libXcomposite-devel')
+ $(vopt_if xinerama libXinerama-devel) $(vopt_if cloudproviders 'libcloudproviders-devel')"
+depends="gtk-update-icon-cache adwaita-icon-theme librsvg shared-mime-info $(vopt_if x11 'dbus-x11')"
+short_desc="GTK+ toolkit (v3)"
+maintainer="Enno Boland <gottox@voidlinux.org>"
+license="LGPL-2.1-or-later"
+homepage="https://www.gtk.org/"
+distfiles="${GNOME_SITE}/gtk+/${version%.*}/gtk+-${version}.tar.xz"
+checksum=b04e09763367f1ce932cd2ee3a359d4de150e1c38e7bef7d29aa72557a6b47c6
+
+# Package build options
+build_options="broadway colord print gir cloudproviders wayland xinerama x11"
+desc_option_broadway="Enable support for the HTML5 Broadway backend"
+desc_option_cloudproviders="Enable integration with cloudproviders, such as Nextcloud"
+
+# Enable all options (other than cloudproviders) by default.
+build_options_default="gir xinerama x11"
+
+do_check() {
+	# Requires xserver running
+	:
+}
+
+do_patch() {
+	# GTK3-Classic patches
+	for p in ${FILESDIR}/*.patch; do
+		patch -Np1 -i $p
+	done
+
+	# Adwaita patch
+	rm -f ${wrksrc}/gtk/theme/Adwaita/gtk-contained{,-dark}.css
+	cat ${FILESDIR}/smaller-adwaita.css | tee -a ${wrksrc}/gtk/theme/Adwaita/gtk-contained{,-dark}.css > /dev/null
+}
+
+post_install() {
+	rm -f ${DESTDIR}/usr/bin/gtk-update-icon-cache
+	rm -f ${DESTDIR}/usr/lib/gtk-3.0/3.0.0/immodules.cache
+	rm -f ${DESTDIR}/usr/share/man/man1/gtk-update-icon-cache.1
+}
+
+gtk+3-devel_package() {
+	depends="${makedepends} ${sourcepkg}>=${version}_${revision}"
+	short_desc+=" - development files"
+	pkg_install() {
+		vmove usr/include
+		vmove usr/lib/pkgconfig
+		vmove "usr/lib/*.so"
+		if [ "$build_option_gir" ]; then
+			vmove usr/share/gir-1.0
+		fi
+		vmove usr/share/aclocal
+	}
+}
