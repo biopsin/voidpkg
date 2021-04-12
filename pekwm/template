@@ -1,8 +1,8 @@
 # Template file for 'pekwm-dev'
 pkgname=pekwm-dev
 version=1
-revision=13
-_commit=26a8ecf12a2233e504304af220325512bff366b8
+revision=14
+_commit=0a6eb2e257265a1a4b7f0432f6de8d57cc12f037
 wrksrc="pekwm-${_commit}"
 build_style=cmake
 configure_args="-DENABLE_SHAPE=OFF -DENABLE_XINERAMA=OFF -DENABLE_RANDR=OFF
@@ -15,7 +15,7 @@ maintainer="biopsin <biopsin@teknik.io>"
 license="GPL-2.0-or-later"
 homepage="https://www.pekwm.org/projects/pekwm"
 distfiles="https://github.com/pekdon/pekwm/archive/${_commit}.tar.gz"
-checksum=853e554f17548ca4fb5b3fb0f6043615bcffcee4dea303f12dda34a2b5ba0e00
+checksum=095db96f0232a9595965fe01ae3b89ab9302359dd47b9457e82cc9a523639a5b
 
 post_install() {
     rm -r ${DESTDIR}/usr/share/pekwm/themes/default
