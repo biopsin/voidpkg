@@ -1,39 +1,34 @@
 # Template file for 'Pale Moon'
 pkgname=palemoon
-version=29.1.0
-revision=1
-_uxpver=20210302
+version=29.1.1
+revision=2
+_uxpver=20210330
 wrksrc="pale-moon"
 hostmakedepends="curl autoconf213 unzip zip pkg-config perl python yasm tar which"
-makedepends=" python-devel libatomic-devel gtk+-devel libSM-devel libXt-devel
- alsa-lib-devel ffmpeg-devel libvpx-devel libpng-devel dav1d-devel"
+makedepends="python-devel libatomic-devel gtk+-devel libXt-devel
+ alsa-lib-devel ffmpeg-devel libvpx-devel libpng-devel libdav1d-devel"
 depends="desktop-file-utils hicolor-icon-theme mime-types"
 short_desc="UXP-based web browser"
 maintainer="biopsin <biopsin@yahoo.no>"
 license="MPL-2.0, GPL-2.0-or-later, LGPL-2.1-or-later"
 homepage="https://www.palemoon.org"
 distfiles="https://repo.palemoon.org/MoonchildProductions/Pale-Moon/archive/${version}_Release.tar.gz"
-checksum=8a9235b56a35cbbb85ab309dd34525a5774472f0f10de9714178e2e7c8596f4a
+checksum=06805818ac990e11a44de2a334523784a44ff4f6a4d698847d92e080eb953536
 python_version=2
 lib32disabled=yes
 
 post_extract() {
     curl https://repo.palemoon.org/MoonchildProductions/UXP/archive/RELBASE_${_uxpver}.tar.gz -O ${builddir}
     tar --strip-components=1 -xvzf RELBASE_${_uxpver}.tar.gz -C platform/
-    rm RELBASE_${_uxpver}.tar.gz
+
+    cp "${FILESDIR}/mozconfig" "${wrksrc}/.mozconfig"
+    mkdir -p /usr/lib/palemoon
 }
 
 do_patch() {
     for p in ${FILESDIR}/*.patch; do
         patch -p0 -i $p
     done
-}
-
-do_configure() {
-    cp "${FILESDIR}/mozconfig" "${wrksrc}/.mozconfig"
-    mkdir -p /usr/lib/palemoon
-    export LDFLAGS+=" -Wl,-rpath=/usr/lib/palemoon"
-    export MOZ_MAKE_FLAGS="${makejobs}"
 }
 
 post_configure() {
@@ -43,7 +38,10 @@ post_configure() {
 }
 
 do_build() {
-    rm -f ${wrksrc}/old-configure
+    export CPPFLAGS="${CPPFLAGS} -O2 -Wno-format-overflow"
+    export LDFLAGS+=" -Wl,-rpath=/usr/lib/palemoon"
+    export MOZ_MAKE_FLAGS="${makejobs}"
+
     ./mach build
 }
 
