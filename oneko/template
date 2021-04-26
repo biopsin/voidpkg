@@ -1,0 +1,23 @@
+# Template file for 'oneko'
+pkgname=oneko
+version=1
+revision=1
+_commit=a29380b94d48a5881bb937bc0d8c898d0f88b5dd
+wrksrc="oneko-${_commit}"
+build_style=cmake
+makedepends="libXext-devel"
+short_desc="Creatures chasing the mouse cursor"
+maintainer="biopsin <biopsin@teknik.io>"
+license="Unlicense"
+homepage="https://github.com/tie/oneko"
+distfiles="https://github.com/borlum/oneko/archive/${_commit}.tar.gz"
+checksum=746a9b61fd498edcb5d271c5ce8c6a3a28f5b47f19b0e25125f5eaa69348eecb
+
+#do_build() {
+#	gcc -Wno-parentheses -std=c11 -pedantic -D_DEFAULT_SOURCE oneko.c -o oneko -lc -lm -lX11 -lXext
+#}
+
+do_install() {
+	mkdir ${DESTDIR}/usr/bin
+	cp ${wrksrc}/build/oneko ${DESTDIR}/usr/bin
+}
