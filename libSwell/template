@@ -1,18 +1,20 @@
 # Template file for 'libSwell'
 pkgname=libSwell
-version=210304
+version=070521
 revision=1
-_commit="3cd6f4d11b5986e7fb6975a66c96f9cbef5f5f37"
-wrksrc="WDL-${_commit}"
+#_commit="3cd6f4d11b5986e7fb6975a66c96f9cbef5f5f37"
+#wrksrc="WDL-${_commit}"
 make_build_args="GDK2=1"
 hostmakedepends="pkg-config"
 makedepends="gtk+-devel libXi-devel"
-short_desc="WDL is a set of simple C++ classes"
+short_desc="Set of simple C++ classes"
 maintainer="biopsin <biopsin@protonmail.com>"
 license="GPL-2-or-later"
 homepage="https://github.com/justinfrankel/WDL"
-distfiles="${homepage}/archive/${_commit}.zip"
-checksum=1bc07c1ca763c6ee17c482695d7a2d7b0943b378738119400cfb67b84ff2da1e
+#distfiles="${homepage}/archive/${_commit}.zip"
+distfiles="https://github.com/gurrgur/WDL/archive/refs/heads/linux-ux-improvements.zip"
+checksum=1c367b22b330ecbf7e3f9b2a1189064ffeccc43f388522ca9eb54225710c3152
+patch_args=-Np1
 
 do_build() {
     cd ${wrksrc}/WDL/swell
