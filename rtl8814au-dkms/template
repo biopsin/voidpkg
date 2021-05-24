@@ -1,0 +1,46 @@
+# Template file for 'rtl8814au-dkms'
+pkgname=rtl8814au-dkms
+version=20210531
+revision=1
+_modver=5.8.5.1
+_gitrev=bdf80b5a932d5267cd1aff66fee8ac244cd38777
+wrksrc="rtl8814au-${_gitrev}"
+depends="dkms"
+short_desc="RTL8814AU drivers"
+maintainer="_biopsin <biopsin@gmail.com>"
+license="GPL-2.0-only"
+homepage="https://www.asus.com/us/Networking/USB-AC68/"
+distfiles="https://github.com/aircrack-ng/rtl8814au/archive/${_gitrev}.tar.gz"
+checksum=cc77ae9eb57aa6be7cc608637a2d69a2eab2844ed698d6b14528174a5ee44e5e
+dkms_modules="rtl8814au ${_modver}"
+
+case "$XBPS_TARGET_MACHINE" in
+	x86_64*) _karch="x86_64";;
+	i686*) _karch="i386";;
+	aarch64*) _karch="arm64";;
+	arm*) _karch="arm";;
+	ppc*) _karch="powerpc";;
+	mips*) _karch="mips";;
+	*) broken="kernel arch not defined";;
+esac
+
+post_patch() {
+	if [ "$XBPS_TARGET_ENDIAN" = "be" ]; then
+		vsed -i 's,@@VOID_ENDIAN@@,BIG,g' Makefile
+	else
+		vsed -i 's,@@VOID_ENDIAN@@,LITTLE,g' Makefile
+	fi
+	vsed -i "s,@@VOID_ARCH@@,${_karch},g" Makefile
+}
+
+do_install() {
+	local dest=/usr/src/rtl8814au-${_modver}
+
+	vmkdir ${dest}
+	cp -r dkms.conf Kconfig Makefile platform core hal include os_dep ${DESTDIR}/${dest}
+
+	# modules-load.d(5) file.
+	vmkdir usr/lib/modules-load.d
+	echo "8814au" > ${DESTDIR}/usr/lib/modules-load.d/${pkgname}.conf
+	chmod 644 ${DESTDIR}/usr/lib/modules-load.d/${pkgname}.conf
+}
