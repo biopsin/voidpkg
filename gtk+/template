@@ -1,6 +1,6 @@
 # Template file for 'gtk+'
 pkgname=gtk+
-version=2.24.32
+version=2.24.33
 revision=4
 build_style=gnu-configure
 build_helper="gir"
@@ -17,7 +17,7 @@ maintainer="Orphaned <orphan@voidlinux.org>"
 license="LGPL-2.1-or-later"
 homepage="http://www.gtk.org"
 distfiles="${GNOME_SITE}/gtk+/2.24/gtk+-${version}.tar.xz"
-checksum=b6c8a93ddda5eabe3bfee1eb39636c9a03d2a56c7b62828b359bf197943c582e
+checksum=ac2ac757f5942d318a311a54b0c80b5ef295f299c2a73c632f6bfb1ff49cc6da
 # gtk-builder-convert:794
 python_version=2
 
