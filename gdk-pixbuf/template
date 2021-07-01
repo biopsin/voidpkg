@@ -1,6 +1,6 @@
 # Template file for 'gdk-pixbuf'
 pkgname=gdk-pixbuf
-version=2.42.0
+version=2.42.6
 revision=1
 build_style=meson
 build_helper="gir"
@@ -15,7 +15,7 @@ maintainer="Orphaned <orphan@voidlinux.org>"
 license="GPL-2.0-or-later"
 homepage="https://wiki.gnome.org/Projects/GdkPixbuf"
 distfiles="${GNOME_SITE}/${pkgname}/${version%.*}/${pkgname}-${version}.tar.xz"
-checksum=73441338d1a901dc7a3940113cb0aac22776b2832f7eab8f8ec7ec5755adaec7
+checksum=c4a6b75b7ed8f58ca48da830b9fa00ed96d668d3ab4b1f723dcf902f78bde77f
 
 # Package build options
 build_options="gir"
