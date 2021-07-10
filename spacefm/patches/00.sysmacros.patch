@@ -1,0 +1,22 @@
+From 1eaa35fcd529c0c95fd02a3e32f881832be706b2 Mon Sep 17 00:00:00 2001
+From: Victor Ananjevsky <victor@sanana.kiev.ua>
+Date: Mon, 5 Apr 2021 08:35:50 +0300
+Subject: [PATCH] add missing include
+
+---
+ src/main.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/main.c b/src/main.c
+index 27f5614e..7566dd84 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -24,6 +24,8 @@
+ #include <sys/socket.h>
+ #include <sys/un.h>
+ 
++#include <sys/sysmacros.h>
++
+ #include <signal.h>
+ 
+ #include <unistd.h> /* for getcwd */

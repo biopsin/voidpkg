@@ -1,0 +1,22 @@
+From 0ae0d5ba788c843bf986e6ab57c191d394610c56 Mon Sep 17 00:00:00 2001
+From: Victor Ananjevsky <victor@sanana.kiev.ua>
+Date: Mon, 5 Apr 2021 08:33:12 +0300
+Subject: [PATCH] add silent rules to configure
+
+---
+ configure.ac | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index 035da60e..6ac3ce02 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -5,6 +5,8 @@ AC_CONFIG_SRCDIR([src/main.c])
+ AM_INIT_AUTOMAKE([dist-bzip2] [subdir-objects])
+ AM_MAINTAINER_MODE
+ 
++AM_SILENT_RULES([yes])
++
+ AM_DISABLE_STATIC
+ 
+ AC_ISC_POSIX
