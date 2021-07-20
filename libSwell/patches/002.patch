@@ -1,0 +1,26 @@
+From 09e67ba6e348a138e579fd918af992369c7b2670 Mon Sep 17 00:00:00 2001
+From: Marcus Gursch <marcus.gursch@rub.de>
+Date: Wed, 5 May 2021 15:53:52 +0200
+Subject: [PATCH] swell: remove vertical separator line in submenus
+
+---
+ WDL/swell/swell-menu-generic.cpp | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/WDL/swell/swell-menu-generic.cpp b/WDL/swell/swell-menu-generic.cpp
+index 39c05203..a5e68425 100644
+--- a/WDL/swell/swell-menu-generic.cpp
++++ b/WDL/swell/swell-menu-generic.cpp
+@@ -542,12 +542,6 @@ static LRESULT WINAPI submenuWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
+           int x;
+           int ypos = top_margin;
+ 
+-          MoveToEx(ps.hdc,cr.left+lcol-SWELL_UI_SCALE(4),cr.top,NULL);
+-          LineTo(ps.hdc,cr.left+lcol-SWELL_UI_SCALE(4),cr.bottom);
+-          SelectObject(ps.hdc,pen);
+-          MoveToEx(ps.hdc,cr.left+lcol-SWELL_UI_SCALE(5),cr.top,NULL);
+-          LineTo(ps.hdc,cr.left+lcol-SWELL_UI_SCALE(5),cr.bottom);
+-
+           hwnd->m_extra[1]=0;
+           for (x=wdl_max(hwnd->m_extra[0],0); x < (menu->items.GetSize()); x++)
+           {

@@ -1,0 +1,22 @@
+From 143ecc6de344d2d6be2567dc6ee4cdaad55f68ee Mon Sep 17 00:00:00 2001
+From: Marcus Gursch <marcus.gursch@rub.de>
+Date: Wed, 5 May 2021 16:32:24 +0200
+Subject: [PATCH] swell: remove (sub-)submenu overlap
+
+---
+ WDL/swell/swell-menu-generic.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/WDL/swell/swell-menu-generic.cpp b/WDL/swell/swell-menu-generic.cpp
+index b53a09ed..0e5d0173 100644
+--- a/WDL/swell/swell-menu-generic.cpp
++++ b/WDL/swell/swell-menu-generic.cpp
+@@ -1076,7 +1076,7 @@ static LRESULT WINAPI submenuWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
+ 
+             RECT r;
+             GetClientRect(hwnd,&r);
+-            m_trackingPt.x=r.right - SWELL_UI_SCALE(3);
++            m_trackingPt.x=r.right;
+             m_trackingPt.y=item_ypos;
+             m_trackingPt2.x=r.left + lcol/4;
+             m_trackingPt2.y=item_ypos;

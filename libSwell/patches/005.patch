@@ -1,0 +1,22 @@
+From b4173ffee20706e2480700b519ef1865b615df98 Mon Sep 17 00:00:00 2001
+From: Marcus Gursch <marcus.gursch@rub.de>
+Date: Wed, 5 May 2021 16:05:25 +0200
+Subject: [PATCH] swell submenu: adjust arrow size and position
+
+---
+ WDL/swell/swell-menu-generic.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/WDL/swell/swell-menu-generic.cpp b/WDL/swell/swell-menu-generic.cpp
+index 59edb35c..445aed09 100644
+--- a/WDL/swell/swell-menu-generic.cpp
++++ b/WDL/swell/swell-menu-generic.cpp
+@@ -648,7 +648,7 @@ static LRESULT WINAPI submenuWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
+             }
+             if (inf->hSubMenu) 
+             {
+-               const int sz = (r.bottom-r.top)/4, xp = r.right - sz*2, yp = (r.top + r.bottom)/2;
++               const int sz = (r.bottom-r.top)/5, xp = r.right - rcol/2 - sz, yp = (r.top + r.bottom)/2;
+ 
+                POINT pts[3] = {
+                  {xp, yp-sz},
