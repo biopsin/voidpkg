@@ -1,0 +1,18 @@
+--- a/xsel.c	2021-08-01 10:45:42.000000000 +0200
++++ b/xsel.c	2021-08-01 10:46:09.980219218 +0200
+@@ -2372,14 +2372,11 @@
+       }
+       // fprintf(stderr,"old_sel = <%s>\n", old_sel);
+       // mck ------------------------
+-
+       printf ("%s", old_sel);
+-      fflush (stdout);
+-
+       if (!do_append && *old_sel != '\0' && isatty(1) &&
+           old_sel[xs_strlen (old_sel) - 1] != '\n')
+       {
+-        fprintf (stderr, "\n\\ No newline at end of selection\n");
++        fflush (stdout);
+       }
+     }
+   }
