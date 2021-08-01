@@ -1,0 +1,152 @@
+--- a/dataMakefile.am	2018-03-04 17:04:33.000000000 +0100
++++ b/data/Makefile.am	2021-08-01 11:25:24.808279011 +0200
+@@ -14,53 +14,13 @@
+ icon48_DATA = \
+ 			spacefm.png \
+ 			spacefm-root.png \
+-			spacefm-find.png \
+-			spacefm-48-cube-blue.png \
+-			spacefm-48-cube-green.png \
+-			spacefm-48-cube-red.png \
+-			spacefm-48-folder-blue.png \
+-			spacefm-48-folder-red.png \
+-			spacefm-48-pyramid-blue.png \
+-			spacefm-48-pyramid-green.png \
+-			spacefm-48-pyramid-red.png
+-
+-icon128dir = $(datadir)/icons/hicolor/128x128/apps
+-icon128_DATA = \
+-			spacefm-128-cube-blue.png \
+-			spacefm-128-cube-green.png \
+-			spacefm-128-cube-red.png \
+-			spacefm-128-pyramid-blue.png \
+-			spacefm-128-pyramid-green.png \
+-			spacefm-128-pyramid-red.png
+-			
+-faenzadir = $(datadir)/icons/Faenza/apps/48
+-faenza_DATA = \
+-			faenza/spacefm.png \
+-			faenza/spacefm-root.png \
+-			faenza/spacefm-find.png
++			spacefm-find.png
+ else
+ icondir = $(datadir)/pixmaps
+ icon_DATA = \
+ 			spacefm.png \
+ 			spacefm-root.png \
+-			spacefm-find.png \
+-			spacefm-128-cube-blue.png \
+-			spacefm-128-cube-green.png \
+-			spacefm-128-cube-red.png \
+-			spacefm-128-pyramid-blue.png \
+-			spacefm-128-pyramid-green.png \
+-			spacefm-128-pyramid-red.png \
+-			spacefm-48-cube-blue.png \
+-			spacefm-48-cube-green.png \
+-			spacefm-48-cube-red.png \
+-			spacefm-48-faenza-blue.png \
+-			spacefm-48-faenza-find.png \
+-			spacefm-48-faenza-red.png \
+-			spacefm-48-folder-blue.png \
+-			spacefm-48-folder-red.png \
+-			spacefm-48-pyramid-blue.png \
+-			spacefm-48-pyramid-green.png \
+-			spacefm-48-pyramid-red.png
++			spacefm-find.png
+ endif
+ 
+ filedir = $(datadir)/spacefm
+--- a/data/Makefile.in	2018-03-04 17:04:33.000000000 +0100
++++ b/data/Makefile.in	2021-08-01 11:24:06.057277011 +0200
+@@ -319,53 +319,13 @@
+ @NO_PIXMAPS_TRUE@icon48_DATA = \
+ @NO_PIXMAPS_TRUE@			spacefm.png \
+ @NO_PIXMAPS_TRUE@			spacefm-root.png \
+-@NO_PIXMAPS_TRUE@			spacefm-find.png \
+-@NO_PIXMAPS_TRUE@			spacefm-48-cube-blue.png \
+-@NO_PIXMAPS_TRUE@			spacefm-48-cube-green.png \
+-@NO_PIXMAPS_TRUE@			spacefm-48-cube-red.png \
+-@NO_PIXMAPS_TRUE@			spacefm-48-folder-blue.png \
+-@NO_PIXMAPS_TRUE@			spacefm-48-folder-red.png \
+-@NO_PIXMAPS_TRUE@			spacefm-48-pyramid-blue.png \
+-@NO_PIXMAPS_TRUE@			spacefm-48-pyramid-green.png \
+-@NO_PIXMAPS_TRUE@			spacefm-48-pyramid-red.png
+-
+-@NO_PIXMAPS_TRUE@icon128dir = $(datadir)/icons/hicolor/128x128/apps
+-@NO_PIXMAPS_TRUE@icon128_DATA = \
+-@NO_PIXMAPS_TRUE@			spacefm-128-cube-blue.png \
+-@NO_PIXMAPS_TRUE@			spacefm-128-cube-green.png \
+-@NO_PIXMAPS_TRUE@			spacefm-128-cube-red.png \
+-@NO_PIXMAPS_TRUE@			spacefm-128-pyramid-blue.png \
+-@NO_PIXMAPS_TRUE@			spacefm-128-pyramid-green.png \
+-@NO_PIXMAPS_TRUE@			spacefm-128-pyramid-red.png
+-
+-@NO_PIXMAPS_TRUE@faenzadir = $(datadir)/icons/Faenza/apps/48
+-@NO_PIXMAPS_TRUE@faenza_DATA = \
+-@NO_PIXMAPS_TRUE@			faenza/spacefm.png \
+-@NO_PIXMAPS_TRUE@			faenza/spacefm-root.png \
+-@NO_PIXMAPS_TRUE@			faenza/spacefm-find.png
++@NO_PIXMAPS_TRUE@			spacefm-find.png
+ 
+ @NO_PIXMAPS_FALSE@icondir = $(datadir)/pixmaps
+ @NO_PIXMAPS_FALSE@icon_DATA = \
+ @NO_PIXMAPS_FALSE@			spacefm.png \
+ @NO_PIXMAPS_FALSE@			spacefm-root.png \
+-@NO_PIXMAPS_FALSE@			spacefm-find.png \
+-@NO_PIXMAPS_FALSE@			spacefm-128-cube-blue.png \
+-@NO_PIXMAPS_FALSE@			spacefm-128-cube-green.png \
+-@NO_PIXMAPS_FALSE@			spacefm-128-cube-red.png \
+-@NO_PIXMAPS_FALSE@			spacefm-128-pyramid-blue.png \
+-@NO_PIXMAPS_FALSE@			spacefm-128-pyramid-green.png \
+-@NO_PIXMAPS_FALSE@			spacefm-128-pyramid-red.png \
+-@NO_PIXMAPS_FALSE@			spacefm-48-cube-blue.png \
+-@NO_PIXMAPS_FALSE@			spacefm-48-cube-green.png \
+-@NO_PIXMAPS_FALSE@			spacefm-48-cube-red.png \
+-@NO_PIXMAPS_FALSE@			spacefm-48-faenza-blue.png \
+-@NO_PIXMAPS_FALSE@			spacefm-48-faenza-find.png \
+-@NO_PIXMAPS_FALSE@			spacefm-48-faenza-red.png \
+-@NO_PIXMAPS_FALSE@			spacefm-48-folder-blue.png \
+-@NO_PIXMAPS_FALSE@			spacefm-48-folder-red.png \
+-@NO_PIXMAPS_FALSE@			spacefm-48-pyramid-blue.png \
+-@NO_PIXMAPS_FALSE@			spacefm-48-pyramid-green.png \
+-@NO_PIXMAPS_FALSE@			spacefm-48-pyramid-red.png
++@NO_PIXMAPS_FALSE@			spacefm-find.png
+ 
+ filedir = $(datadir)/spacefm
+ uidir = $(filedir)/ui
+@@ -702,9 +662,9 @@
+ 
+ info-am:
+ 
+-install-data-am: install-desktopDATA install-faenzaDATA \
+-	install-fileDATA install-htmlDATA install-icon128DATA \
+-	install-icon48DATA install-iconDATA install-uiDATA
++install-data-am: install-desktopDATA install-fileDATA \
++	install-htmlDATA install-icon48DATA install-iconDATA \
++	install-uiDATA
+ 
+ install-dvi: install-dvi-am
+ 
+@@ -759,18 +719,16 @@
+ 	distclean-libtool distdir dvi dvi-am html html-am info info-am \
+ 	install install-am install-data install-data-am \
+ 	install-desktopDATA install-dvi install-dvi-am install-exec \
+-	install-exec-am install-faenzaDATA install-fileDATA \
+-	install-html install-html-am install-htmlDATA \
+-	install-icon128DATA install-icon48DATA install-iconDATA \
++	install-exec-am install-fileDATA install-html install-html-am \
++	install-htmlDATA install-icon48DATA install-iconDATA \
+ 	install-info install-info-am install-man install-pdf \
+ 	install-pdf-am install-ps install-ps-am install-strip \
+ 	install-uiDATA installcheck installcheck-am installdirs \
+ 	maintainer-clean maintainer-clean-generic mostlyclean \
+ 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
+ 	tags-am uninstall uninstall-am uninstall-desktopDATA \
+-	uninstall-faenzaDATA uninstall-fileDATA uninstall-htmlDATA \
+-	uninstall-icon128DATA uninstall-icon48DATA uninstall-iconDATA \
+-	uninstall-uiDATA
++	uninstall-fileDATA uninstall-htmlDATA uninstall-icon48DATA \
++	uninstall-iconDATA uninstall-uiDATA
+ 
+ @INTLTOOL_DESKTOP_RULE@
+ 
