@@ -1,0 +1,448 @@
+--- a/src/vnr-window-copy2.h	2018-05-13 11:40:40.000000000 +0200
++++ b/src/vnr-window.h	2021-02-14 09:21:38.082244802 +0100
+@@ -102,8 +102,6 @@
+     guint ss_source_tag;
+     gint ss_timeout;
+     GtkWidget *ss_timeout_widget;
+-
+-    GtkActionGroup *action_wallpaper;
+ };
+ 
+ struct _VnrWindowClass {
+
+--- a/src/vnr-window-copy2.c	2018-05-13 11:40:40.000000000 +0200
++++ b/src/vnr-window.c	2021-02-14 09:24:42.624249488 +0100
+@@ -104,7 +104,6 @@
+       "<menuitem action=\"ImageRotateCCW\"/>"
+       "<separator/>"
+       "<menuitem action=\"ImageCrop\"/>"
+-      "<placeholder name=\"WallpaperEntry\"/>"
+     "</menu>"
+     "<menu action=\"Go\">"
+       "<menuitem name=\"GoPrevious\" action=\"GoPrevious\"/>"
+@@ -154,7 +153,6 @@
+       "<menuitem action=\"ImageRotateCCW\"/>"
+       "<separator/>"
+       "<menuitem action=\"ImageCrop\"/>"
+-      "<placeholder name=\"WallpaperEntry\"/>"
+     "</menu>"
+     "<separator/>"
+     "<menuitem action=\"EditPreferences\"/>"
+@@ -187,7 +185,6 @@
+     "<menuitem action=\"ViewZoomIn\"/>"
+     "<menuitem action=\"ViewZoomOut\"/>"
+     "<menuitem action=\"ViewZoomNormal\"/>"
+-    "<placeholder name=\"WallpaperEntry\"/>"
+     "<separator/>"
+     "<menuitem name=\"MenuBar\" action=\"ViewMenuBar\"/>"
+     "<menuitem name=\"Toolbar\" action=\"ViewToolbar\"/>"
+@@ -203,34 +200,6 @@
+ "</ui>";
+ 
+ 
+-const gchar *ui_definition_wallpaper = "<ui>"
+-  "<menubar name=\"MainMenu\">"
+-    "<menu action=\"Image\">"
+-      "<placeholder name=\"WallpaperEntry\">"
+-        "<separator/>"
+-        "<menuitem name=\"Wallpaper\" action=\"SetAsWallpaper\"/>"
+-      "</placeholder>"
+-    "</menu>"
+-  "</menubar>"
+-  "<popup name=\"ButtonMenu\">"
+-    "<menu action=\"Image\">"
+-      "<placeholder name=\"WallpaperEntry\">"
+-        "<separator/>"
+-        "<menuitem name=\"Wallpaper\" action=\"SetAsWallpaper\"/>"
+-      "</placeholder>"
+-    "</menu>"
+-  "</popup>"
+-  "<popup name=\"PopupMenu\">"
+-    "<placeholder name=\"WallpaperEntry\">"
+-      "<separator/>"
+-      "<menuitem action=\"SetAsWallpaper\"/>"
+-    "</placeholder>"
+-  "</popup>"
+-"</ui>";
+-
+-/*************************************************************/
+-/***** Private actions ***************************************/
+-/*************************************************************/
+ /* Modified version of eog's eog_window_update_openwith_menu */
+ static void
+ vnr_window_update_openwith_menu (VnrWindow *window)
+@@ -1389,92 +1358,6 @@
+ }
+ 
+ static void
+-vnr_set_wallpaper(GtkAction *action, VnrWindow *win)
+-{
+-    pid_t pid;
+-
+-    pid = fork();
+-
+-    if ( pid == 0 ) {
+-        gchar * tmp;
+-
+-        VnrPrefsDesktop desktop_environment = win->prefs->desktop;
+-
+-        if (desktop_environment == VNR_PREFS_DESKTOP_AUTO)
+-        {
+-            desktop_environment = uni_detect_desktop_environment();
+-        }
+-
+-        switch(desktop_environment) {
+-            case VNR_PREFS_DESKTOP_GNOME2:
+-                execlp("gconftool-2", "gconftool-2",
+-                        "--set", "/desktop/gnome/background/picture_filename",
+-                        "--type", "string",
+-                        VNR_FILE(win->file_list->data)->path,
+-                        NULL);
+-                break;
+-            case VNR_PREFS_DESKTOP_MATE:
+-                execlp("gsettings", "gsettings",
+-                        "set", "org.mate.background",
+-                        "picture-filename", VNR_FILE(win->file_list->data)->path,
+-                        NULL);
+-                break;
+-            case VNR_PREFS_DESKTOP_GNOME3:
+-                tmp = g_strdup_printf("file://%s", VNR_FILE(win->file_list->data)->path);
+-                execlp("gsettings", "gsettings",
+-                        "set", "org.gnome.desktop.background",
+-                        "picture-uri", tmp,
+-                        NULL);
+-                break;
+-            case VNR_PREFS_DESKTOP_XFCE:
+-                tmp = g_strdup_printf("/backdrop/screen%d/monitor0/workspace0/last-image",
+-                                        gdk_screen_get_number(gtk_widget_get_screen(GTK_WIDGET(win))));
+-                execlp("xfconf-query", "xfconf-query",
+-                        "-c", "xfce4-desktop",
+-                        "-p", tmp,
+-                        "--type", "string",
+-                        "--set",
+-                        VNR_FILE(win->file_list->data)->path,
+-                        NULL);
+-                break;
+-            case VNR_PREFS_DESKTOP_LXDE:
+-                execlp("pcmanfm", "pcmanfm",
+-                        "--set-wallpaper",
+-                        VNR_FILE(win->file_list->data)->path,
+-                        NULL);
+-                break;
+-            case VNR_PREFS_DESKTOP_PUPPY:
+-                execlp("set_bg", "set_bg",
+-                        VNR_FILE(win->file_list->data)->path,
+-                        NULL);
+-                break;
+-            case VNR_PREFS_DESKTOP_FLUXBOX:
+-                execlp("fbsetbg", "fbsetbg",
+-                        "-f", VNR_FILE(win->file_list->data)->path,
+-                        NULL);
+-                break;
+-            case VNR_PREFS_DESKTOP_NITROGEN:
+-                execlp("nitrogen", "nitrogen",
+-                        "--set-zoom-fill", "--save",
+-                        VNR_FILE(win->file_list->data)->path,
+-                        NULL);
+-                break;
+-            case VNR_PREFS_DESKTOP_CINNAMON:
+-                tmp = g_strdup_printf("file://%s", VNR_FILE(win->file_list->data)->path);
+-                execlp("gsettings", "gsettings",
+-                        "set", "org.cinnamon.desktop.background",
+-                        "picture-uri", tmp,
+-                        NULL);
+-                break;
+-            default:
+-                _exit(0);
+-        }
+-    } else {
+-        wait(NULL);
+-    }
+-}
+-
+-static void
+ vnr_window_cmd_fullscreen (GtkAction *action, VnrWindow *window)
+ {
+     gboolean fullscreen;
+@@ -1798,12 +1681,6 @@
+       G_CALLBACK (vnr_window_cmd_open_menu) },
+ };
+ 
+-static const GtkActionEntry action_entry_wallpaper[] = {
+-    { "SetAsWallpaper", NULL, N_("Set as _Wallpaper"), "<control>F8",
+-      N_("Set the selected image as the desktop background"),
+-      G_CALLBACK (vnr_set_wallpaper) },
+-};
+-
+ static const GtkActionEntry action_entries_image[] = {
+     { "FileOpenWith", NULL, N_("Open _With"), NULL,
+       N_("Open the selected image with a different application"),
+@@ -2199,27 +2076,6 @@
+             g_error_free (error);
+     }
+ 
+-    window->action_wallpaper = gtk_action_group_new("ActionWallpaper");
+-
+-    gtk_action_group_set_translation_domain (window->action_wallpaper,
+-                                             GETTEXT_PACKAGE);
+-
+-    gtk_action_group_add_actions (window->action_wallpaper,
+-                                  action_entry_wallpaper,
+-                                  G_N_ELEMENTS (action_entry_wallpaper),
+-                                  window);
+-
+-    gtk_ui_manager_insert_action_group (window->ui_mngr,
+-                                        window->action_wallpaper, 0);
+-
+-    if (!gtk_ui_manager_add_ui_from_string (window->ui_mngr,
+-                                            ui_definition_wallpaper, -1,
+-                                            &error)) {
+-            g_error ("building menus failed: %s\n", error->message);
+-            g_error_free (error);
+-    }
+-    gtk_action_group_set_sensitive(window->action_wallpaper, FALSE);
+-
+     gtk_action_group_set_sensitive(window->actions_collection, FALSE);
+     gtk_action_group_set_sensitive(window->actions_image, FALSE);
+     gtk_action_group_set_sensitive(window->actions_static_image, FALSE);
+@@ -2378,7 +2234,6 @@
+     }
+ 
+     gtk_action_group_set_sensitive(window->actions_image, TRUE);
+-    gtk_action_group_set_sensitive(window->action_wallpaper, TRUE);
+ 
+     format = gdk_pixbuf_get_file_info (file->path, NULL, NULL);
+ 
+@@ -2506,7 +2361,6 @@
+     gtk_window_set_title (GTK_WINDOW (window), "Viewnior");
+     uni_anim_view_set_anim (UNI_ANIM_VIEW (window->view), NULL);
+     gtk_action_group_set_sensitive(window->actions_image, FALSE);
+-    gtk_action_group_set_sensitive(window->action_wallpaper, FALSE);
+     gtk_action_group_set_sensitive(window->actions_static_image, FALSE);
+ }
+ 
+--- a/src/vnr-prefs-copy2.h	2021-02-14 09:28:53.000000000 +0100
++++ b/src/vnr-prefs.h	2021-02-14 09:29:05.111256153 +0100
+@@ -46,20 +46,6 @@
+     VNR_PREFS_ZOOM_LAST_USED,
+ } VnrPrefsZoom;
+ 
+-
+-typedef enum{
+-    VNR_PREFS_DESKTOP_GNOME2,
+-    VNR_PREFS_DESKTOP_GNOME3,
+-    VNR_PREFS_DESKTOP_XFCE,
+-    VNR_PREFS_DESKTOP_LXDE,
+-    VNR_PREFS_DESKTOP_PUPPY,
+-    VNR_PREFS_DESKTOP_FLUXBOX,
+-    VNR_PREFS_DESKTOP_NITROGEN,
+-    VNR_PREFS_DESKTOP_MATE,
+-    VNR_PREFS_DESKTOP_CINNAMON,
+-    VNR_PREFS_DESKTOP_AUTO,
+-} VnrPrefsDesktop;
+-
+ typedef enum{
+     VNR_PREFS_WHEEL_NAVIGATE ,
+     VNR_PREFS_WHEEL_ZOOM ,
+@@ -82,12 +68,10 @@
+     GObject parent;
+ 
+     VnrPrefsZoom zoom;
+-
+-    VnrPrefsDesktop desktop;
+-
+     VnrPrefsWheel behavior_wheel;
+     VnrPrefsClick behavior_click;
+     VnrPrefsModify behavior_modify;
++
+     gboolean fit_on_fullscreen;
+     gboolean show_hidden;
+     gboolean smooth_images;
+@@ -100,6 +84,7 @@
+     gboolean start_slideshow;
+     gboolean start_fullscreen;
+     gboolean auto_resize;
++
+     int slideshow_timeout;
+     int jpeg_quality;
+     int png_compression;
+
+--- a/src/vnr-prefs-copy2.c	2018-05-13 11:40:40.000000000 +0200
++++ b/src/vnr-prefs.c	2021-02-14 09:32:08.544260810 +0100
+@@ -77,13 +77,6 @@
+ }
+ 
+ static void
+-change_desktop_env_cb (GtkComboBox *widget, gpointer user_data)
+-{
+-    VNR_PREFS(user_data)->desktop = gtk_combo_box_get_active(widget);
+-    vnr_prefs_save(VNR_PREFS(user_data));
+-}
+-
+-static void
+ change_jpeg_quality_cb (GtkRange *range, gpointer user_data)
+ {
+     VNR_PREFS(user_data)->jpeg_quality = (int) gtk_range_get_value(range);
+@@ -168,7 +161,6 @@
+     prefs->start_slideshow = FALSE;
+     prefs->start_fullscreen = FALSE;
+     prefs->auto_resize = FALSE;
+-    prefs->desktop = VNR_PREFS_DESKTOP_AUTO;
+ }
+ 
+ static GtkWidget *
+@@ -194,9 +186,6 @@
+     GtkRange *jpeg_scale;
+     GtkRange *png_scale;
+ 
+-    GtkBox *desktop_box;
+-    GtkComboBox *desktop_env;
+-
+     builder = gtk_builder_new ();
+     gtk_builder_add_from_file (builder, UI_PATH, &error);
+ 
+@@ -270,27 +259,6 @@
+ 
+     g_signal_connect(G_OBJECT(zoom_mode), "changed", G_CALLBACK(change_zoom_mode_cb), prefs);
+ 
+-    /* Desktop combo box */
+-    desktop_box = GTK_BOX (gtk_builder_get_object (builder, "desktop_box"));
+-
+-    desktop_env = (GtkComboBox*) gtk_combo_box_new_text();
+-    gtk_combo_box_append_text(desktop_env, "GNOME 2");
+-    gtk_combo_box_append_text(desktop_env, "GNOME 3");
+-    gtk_combo_box_append_text(desktop_env, "XFCE");
+-    gtk_combo_box_append_text(desktop_env, "LXDE");
+-    gtk_combo_box_append_text(desktop_env, "PUPPY");
+-    gtk_combo_box_append_text(desktop_env, "FluxBox");
+-    gtk_combo_box_append_text(desktop_env, "Nitrogen");
+-    gtk_combo_box_append_text(desktop_env, "MATE");
+-    gtk_combo_box_append_text(desktop_env, "Cinnamon");
+-    gtk_combo_box_append_text(desktop_env, _("Autodetect"));
+-    gtk_combo_box_set_active(desktop_env, prefs->desktop);
+-
+-    gtk_box_pack_end (desktop_box, GTK_WIDGET(desktop_env), FALSE, FALSE, 0);
+-    gtk_widget_show(GTK_WIDGET(desktop_env));
+-
+-    g_signal_connect(G_OBJECT(desktop_env), "changed", G_CALLBACK(change_desktop_env_cb), prefs);
+-
+     /* Behavior combo boxes */
+     behavior_table = GTK_TABLE (gtk_builder_get_object (builder, "behavior_table"));
+ 
+@@ -373,7 +341,6 @@
+     prefs->behavior_modify = g_key_file_get_integer (conf, "prefs", "behavior-modify", &error);
+     prefs->jpeg_quality = g_key_file_get_integer (conf, "prefs", "jpeg-quality", &error);
+     prefs->png_compression = g_key_file_get_integer (conf, "prefs", "png-compression", &error);
+-    prefs->desktop = g_key_file_get_integer (conf, "prefs", "desktop", &error);
+ 
+     if(error != NULL)
+     {
+@@ -463,7 +430,6 @@
+     g_key_file_set_integer (conf, "prefs", "behavior-modify", prefs->behavior_modify);
+     g_key_file_set_integer (conf, "prefs", "jpeg-quality", prefs->jpeg_quality);
+     g_key_file_set_integer (conf, "prefs", "png-compression", prefs->png_compression);
+-    g_key_file_set_integer (conf, "prefs", "desktop", prefs->desktop);
+ 
+     if(g_mkdir_with_parents (dir, 0700) != 0)
+         g_warning("Error creating config file's parent directory (%s)\n", dir);
+
+--- a/src/uni-utils-copy2.h	2018-05-13 11:40:40.000000000 +0200
++++ b/src/uni-utils.h	2021-02-14 09:45:51.518281707 +0100
+@@ -53,6 +53,4 @@
+                                          GdkRectangle * inner,
+                                          GdkRectangle around[4]);
+ 
+-VnrPrefsDesktop uni_detect_desktop_environment ();
+-
+ #endif /* __UNI_UTILS_H__ */
+
+--- a/src/uni-utils-copy2.c	2018-05-13 11:40:40.000000000 +0200
++++ b/src/uni-utils.c	2021-02-14 09:48:50.701286257 +0100
+@@ -100,53 +100,3 @@
+             outer->width,
+             (outer->y + outer->height) - (inner->y + inner->height)};
+ }
+-
+-VnrPrefsDesktop
+-uni_detect_desktop_environment ()
+-{
+-    VnrPrefsDesktop environment = VNR_PREFS_DESKTOP_GNOME3;
+-
+-    gchar *xdg_current_desktop = g_ascii_strup(getenv("XDG_CURRENT_DESKTOP"), -1);
+-    gchar *xdg_session_desktop = g_ascii_strup(getenv("XDG_SESSION_DESKTOP"), -1);
+-    gchar *desktop_session = g_ascii_strdown(getenv("DESKTOP_SESSION"), -1);
+-    gchar *gdmsession = g_ascii_strdown(getenv("GDMSESSION"), -1);
+-
+-    if (!g_strcmp0(xdg_current_desktop, "GNOME") || !g_strcmp0(xdg_session_desktop, "GNOME"))
+-    {
+-        if (!g_strcmp0(gdmsession, "gnome-classic") || !g_strcmp0(gdmsession, "gnome-fallback"))
+-        {
+-            environment = VNR_PREFS_DESKTOP_GNOME2;
+-        }
+-        else if (!g_strcmp0(gdmsession, "cinnamon"))
+-        {
+-            environment = VNR_PREFS_DESKTOP_CINNAMON;
+-        }
+-    }
+-    else if (!g_strcmp0(xdg_current_desktop, "XFCE") || !g_strcmp0(xdg_session_desktop, "XFCE"))
+-    {
+-        environment = VNR_PREFS_DESKTOP_XFCE;
+-    }
+-    else if (!g_strcmp0(xdg_current_desktop, "MATE") || !g_strcmp0(xdg_session_desktop, "MATE"))
+-    {
+-        environment = VNR_PREFS_DESKTOP_MATE;
+-    }
+-    else if (!g_strcmp0(xdg_current_desktop, "LXDE") || !g_strcmp0(xdg_session_desktop, "LXDE"))
+-    {
+-        environment = VNR_PREFS_DESKTOP_LXDE;
+-    }
+-    else if (!g_strcmp0(desktop_session, "fluxbox"))
+-    {
+-        environment = VNR_PREFS_DESKTOP_FLUXBOX;
+-    }
+-    else
+-    {
+-        g_warning("Cannot detect desktop environment. Defaulting to GNOME 3.\n");
+-    }
+-
+-    g_free(xdg_current_desktop);
+-    g_free(xdg_session_desktop);
+-    g_free(desktop_session);
+-    g_free(gdmsession);
+-
+-    return environment;
+-}
+
+--- a/data/vnr-preferences-dialog-copy2.ui	2018-05-13 11:40:40.000000000 +0200
++++ b/data/vnr-preferences-dialog.ui	2021-02-14 09:58:47.004301398 +0100
+@@ -65,29 +65,6 @@
+                   </packing>
+                 </child>
+                 <child>
+-                  <object class="GtkHBox" id="desktop_box">
+-                    <property name="visible">True</property>
+-                    <child>
+-                      <object class="GtkLabel" id="label8">
+-                        <property name="visible">True</property>
+-                        <property name="label" translatable="yes">Desktop: </property>
+-                      </object>
+-                      <packing>
+-                        <property name="expand">False</property>
+-                        <property name="fill">False</property>
+-                        <property name="position">0</property>
+-                      </packing>
+-                    </child>
+-                    <child>
+-                      <placeholder/>
+-                    </child>
+-                  </object>
+-                  <packing>
+-                    <property name="expand">False</property>
+-                    <property name="position">1</property>
+-                  </packing>
+-                </child>
+-                <child>
+                   <object class="GtkCheckButton" id="smooth_images">
+                     <property name="label" translatable="yes">Smooth images when zoomed</property>
+                     <property name="visible">True</property>
+

@@ -1,0 +1,20 @@
+--- a/src/vnr-window.c	2021-01-22 06:42:56.000000000 +0100
++++ b/src/vnr-window.c	2021-01-22 06:48:34.473197203 +0100
+@@ -1834,7 +1834,7 @@
+     { "FileProperties", GTK_STOCK_PROPERTIES, N_("_Properties..."), "<Alt>Return",
+       N_("Show information about the current file"),
+       G_CALLBACK (vnr_window_cmd_properties) },
+-    { "FileReload", GTK_STOCK_REFRESH, N_("_Reload"), NULL,
++    { "FileReload", GTK_STOCK_REFRESH, N_("_Reload"), "F5",
+       N_("Reload the current file"),
+       G_CALLBACK (vnr_window_cmd_reload) },
+     { "Delete", NULL, N_("_Delete"), "Delete",
+@@ -1906,7 +1906,7 @@
+ };
+ 
+ static const GtkToggleActionEntry toggle_entries_collection[] = {
+-    { "ViewSlideshow", GTK_STOCK_NETWORK, N_("Sli_deshow"), "F5",
++    { "ViewSlideshow", GTK_STOCK_NETWORK, N_("Sli_deshow"), "<control>Return",
+       N_("Show in slideshow mode"),
+       G_CALLBACK (vnr_window_cmd_slideshow) },
+ };

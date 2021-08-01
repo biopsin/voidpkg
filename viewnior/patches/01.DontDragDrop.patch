@@ -1,0 +1,24 @@
+From 4512967cb67e00078cfdc49b9a54a17951207baa Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Alexandre-Xavier=20Labont=C3=A9-Lamoureux?=
+ <alexandrexavier@live.ca>
+Date: Mon, 14 Oct 2019 17:44:44 -0400
+Subject: [PATCH] Don't allow drag and drop if source is the viewer itself
+
+---
+ src/vnr-window.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/vnr-window.c b/src/vnr-window.c
+index 435b45d..a737600 100755
+--- a/src/vnr-window.c
++++ b/src/vnr-window.c
+@@ -2062,6 +2062,9 @@ vnr_window_drag_data_received (GtkWidget *widget,
+     if (!gtk_targets_include_uri (&target, 1))
+         return;
+ 
++    if (gtk_drag_get_source_widget (context))
++        return;
++
+     suggested_action = gdk_drag_context_get_suggested_action (context);
+     if (suggested_action == GDK_ACTION_COPY || suggested_action == GDK_ACTION_ASK)
+     {
