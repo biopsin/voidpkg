@@ -18,8 +18,11 @@ python_version=2
 lib32disabled=yes
 
 post_extract() {
-    curl https://repo.palemoon.org/MoonchildProductions/UXP/archive/RELBASE_${_uxpver}.tar.gz -O ${builddir}
-    tar --strip-components=1 -xvzf RELBASE_${_uxpver}.tar.gz -C platform/
+    [ ! -f "${XBPS_SRCDISTDIR}/${pkgname}-${version}/RELBASE_${_uxpver}.tar.gz" ] && \
+        curl https://repo.palemoon.org/MoonchildProductions/UXP/archive/RELBASE_${_uxpver}.tar.gz \
+        -O ${XBPS_SRCDISTDIR}/$${pkgname}-${version}
+    tar --strip-components=1 -xvzf \
+        ${XBPS_SRCDISTDIR}/${pkgname}-${version}/RELBASE_${_uxpver}.tar.gz -C platform/
 
     cp "${FILESDIR}/mozconfig" "${wrksrc}/.mozconfig"
     mkdir -p /usr/lib/palemoon
