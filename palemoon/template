@@ -41,7 +41,6 @@ post_configure() {
 }
 
 do_build() {
-    export CPPFLAGS="${CPPFLAGS} -O2 -Wno-format-overflow"
     export LDFLAGS+=" -Wl,-rpath=/usr/lib/palemoon"
     export MOZ_MAKE_FLAGS="${makejobs}"
 
