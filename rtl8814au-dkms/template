@@ -1,6 +1,6 @@
 # Template file for 'rtl8814au-dkms'
 pkgname=rtl8814au-dkms
-version=20210531
+version=20210331
 revision=1
 _modver=5.8.5.1
 _gitrev=bdf80b5a932d5267cd1aff66fee8ac244cd38777
