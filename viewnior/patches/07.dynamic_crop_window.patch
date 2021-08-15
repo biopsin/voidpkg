@@ -1,0 +1,40 @@
+From c84708939bf350cfa12cc14f05ac8b39af68fd50 Mon Sep 17 00:00:00 2001
+From: Siyan Panayotov <contact@siyanpanayotov.com>
+Date: Sun, 15 Aug 2021 12:50:47 +0200
+Subject: [PATCH] Increase size of the Crop window to dynamically fit the screen
+
+---
+ src/vnr-crop.c | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
+
+diff --git a/src/vnr-crop.c b/src/vnr-crop.c
+index 6cbe4b4..31d9c0f 100644
+--- a/src/vnr-crop.c
++++ b/src/vnr-crop.c
+@@ -115,11 +115,25 @@ vnr_crop_build_dialog (VnrCrop *crop)
+     original = uni_image_view_get_pixbuf(UNI_IMAGE_VIEW(crop->vnr_win->view));
+ 
+     gdouble width, height;
++    gint max_width, max_height;
+ 
+     width = crop->vnr_win->current_image_width;
+     height = crop->vnr_win->current_image_height;
+ 
+-    vnr_tools_fit_to_size_double(&height, &width, 400,400);
++    {
++        GdkScreen *screen;
++        GdkRectangle monitor;
++        screen = gtk_window_get_screen (GTK_WINDOW (crop->vnr_win));
++        gdk_screen_get_monitor_geometry (screen,
++                                        gdk_screen_get_monitor_at_window (screen,
++                                        gtk_widget_get_window (GTK_WIDGET (crop->vnr_win))),
++                                        &monitor);
++
++        max_width = monitor.width * 0.7 - 100;
++        max_height = monitor.height * 0.7 - 200;
++    }
++
++    vnr_tools_fit_to_size_double(&width, &height, max_width, max_height);
+     crop->width = width;
+     crop->height = height;
+     crop->zoom = ( width/crop->vnr_win->current_image_width

@@ -1,0 +1,133 @@
+From 41af22b7202afb761bdc2076b7eeb28011add91d Mon Sep 17 00:00:00 2001
+From: Siyan Panayotov <contact@siyanpanayotov.com>
+Date: Tue, 11 May 2021 23:21:01 +0200
+Subject: [PATCH] Query mtime on file list construction
+
+---
+ src/vnr-file.c              | 10 ++++++++--
+ src/vnr-file.h              |  1 +
+ src/vnr-properties-dialog.c | 32 ++++++++++----------------------
+ 3 files changed, 19 insertions(+), 24 deletions(-)
+
+diff --git a/src/vnr-file.c b/src/vnr-file.c
+index 2649fdc..19a46ef 100644
+--- a/src/vnr-file.c
++++ b/src/vnr-file.c
+@@ -139,7 +139,8 @@ vnr_file_dir_content_to_list(gchar *path, gboolean sort, gboolean include_hidden
+     f_enum = g_file_enumerate_children(file, G_FILE_ATTRIBUTE_STANDARD_NAME","
+                                        G_FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME","
+                                        G_FILE_ATTRIBUTE_STANDARD_CONTENT_TYPE","
+-                                       G_FILE_ATTRIBUTE_STANDARD_IS_HIDDEN,
++                                       G_FILE_ATTRIBUTE_STANDARD_IS_HIDDEN","
++                                       G_FILE_ATTRIBUTE_TIME_MODIFIED,
+                                        G_FILE_QUERY_INFO_NONE,
+                                        NULL, NULL);
+     file_info = g_file_enumerator_next_file(f_enum,NULL,NULL);
+@@ -153,6 +154,8 @@ vnr_file_dir_content_to_list(gchar *path, gboolean sort, gboolean include_hidden
+         if(vnr_file_is_supported_mime_type(mimetype) && (include_hidden || !g_file_info_get_is_hidden (file_info)) ){
+             vnr_file_set_display_name(vnr_file, (char*)g_file_info_get_display_name (file_info));
+ 
++            vnr_file->mtime = g_file_info_get_attribute_uint64 (file_info, G_FILE_ATTRIBUTE_TIME_MODIFIED);
++
+             vnr_file->path =g_strjoin(G_DIR_SEPARATOR_S, path,
+                                       vnr_file->display_name, NULL);
+ 
+@@ -238,7 +241,8 @@ vnr_file_load_uri_list (GSList *uri_list, GList **file_list, gboolean include_hi
+         GFileInfo *fileinfo = g_file_query_info (file, G_FILE_ATTRIBUTE_STANDARD_TYPE","
+                                       G_FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME","
+                                       G_FILE_ATTRIBUTE_STANDARD_CONTENT_TYPE","
+-                                      G_FILE_ATTRIBUTE_STANDARD_IS_HIDDEN,
++                                      G_FILE_ATTRIBUTE_STANDARD_IS_HIDDEN","
++                                       G_FILE_ATTRIBUTE_TIME_MODIFIED,
+                                       0, NULL, error);
+ 
+         if (fileinfo == NULL)
+@@ -269,6 +273,8 @@ vnr_file_load_uri_list (GSList *uri_list, GList **file_list, gboolean include_hi
+             {
+                 vnr_file_set_display_name(new_vnrfile, (char*)g_file_info_get_display_name (fileinfo));
+ 
++                new_vnrfile->mtime = g_file_info_get_attribute_uint64 (fileinfo, G_FILE_ATTRIBUTE_TIME_MODIFIED);
++
+                 new_vnrfile->path = p_path;
+ 
+                 *file_list = g_list_prepend(*file_list, new_vnrfile);
+diff --git a/src/vnr-file.h b/src/vnr-file.h
+index f4cce26..bd6ee81 100644
+--- a/src/vnr-file.h
++++ b/src/vnr-file.h
+@@ -40,6 +40,7 @@ struct _VnrFile {
+     const gchar *display_name;
+     const gchar *display_name_collate;
+     const gchar *path;
++    time_t mtime;
+ };
+ 
+ struct _VnrFileClass {
+diff --git a/src/vnr-properties-dialog.c b/src/vnr-properties-dialog.c
+index a4fda4e..20ea1fe 100644
+--- a/src/vnr-properties-dialog.c
++++ b/src/vnr-properties-dialog.c
+@@ -18,10 +18,10 @@
+  */
+ 
+ #include <libintl.h>
++#include <glib/gstdio.h>
+ #include <glib/gi18n.h>
+ #define _(String) gettext (String)
+ 
+-#include <sys/stat.h>
+ #include <time.h>
+ #include <locale.h>
+ #include "vnr-properties-dialog.h"
+@@ -355,42 +355,30 @@ vnr_properties_dialog_update_metadata(VnrPropertiesDialog *dialog)
+         (void*)dialog);
+ }
+ 
+-static void
+-vnr_get_modified_time(struct stat filestat, char* buffer, int bufsize)
+-{
+-    char* saved_locale = strdup(setlocale(LC_TIME, NULL));
+-    setlocale(LC_TIME, "");
+-    strftime(buffer, bufsize, "%Ec", localtime(&filestat.st_mtime));
+-
+-    setlocale(LC_TIME, saved_locale);
+-    free(saved_locale);
+-}
+-
+ void
+ vnr_properties_dialog_update_image(VnrPropertiesDialog *dialog)
+ {
+-    gchar *width_str, *height_str, *modified_str;
++    gchar *width_str, *height_str;
++    int date_modified_buf_size = 80;
++    gchar date_modified[date_modified_buf_size];
+ 
+-    struct stat filestat;
+-    stat((gchar*)VNR_FILE(dialog->vnr_win->file_list->data)->path, &filestat);
+-    int bufsize = 80;
+-    char buffer[bufsize];
+-    vnr_get_modified_time(filestat, buffer, bufsize);
++    strftime(date_modified,
++             date_modified_buf_size * sizeof(gchar),
++             "%Ec",
++             localtime(&VNR_FILE(dialog->vnr_win->file_list->data)->mtime));
++    gtk_label_set_text(GTK_LABEL(dialog->modified_label), date_modified);
+ 
+     set_new_pixbuf(dialog, uni_image_view_get_pixbuf(UNI_IMAGE_VIEW(dialog->vnr_win->view)));
+     gtk_image_set_from_pixbuf (GTK_IMAGE(dialog->image), dialog->thumbnail);
+ 
+-    width_str  = g_strdup_printf("%i px", dialog->vnr_win->current_image_width);
++    width_str = g_strdup_printf("%i px", dialog->vnr_win->current_image_width);
+     height_str = g_strdup_printf("%i px", dialog->vnr_win->current_image_height);
+-    modified_str = g_strdup_printf("%s", buffer);
+ 
+     gtk_label_set_text(GTK_LABEL(dialog->width_label), width_str);
+     gtk_label_set_text(GTK_LABEL(dialog->height_label), height_str);
+-    gtk_label_set_text(GTK_LABEL(dialog->modified_label), modified_str);
+ 
+     g_free(width_str);
+     g_free(height_str);
+-    g_free(modified_str);
+ }
+ 
+ void
