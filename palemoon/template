@@ -36,9 +36,11 @@ do_patch() {
 }
 
 post_configure() {
-	vsed 's|xlocale|locale|' -i platform/intl/icu/source/i18n/digitlst.cpp
-	vsed 's|NSS_ALLOW_SSLKEYLOGFILE=1|NSS_ALLOW_SSLKEYLOGFILE=0|' -i platform/config/external/nss/Makefile.in
-	vsed 's|enable_sslkeylogfile==1|enable_sslkeylogfile==0|' -i platform/security/nss/lib/ssl/ssl.gyp
+	vsed -i 's|xlocale|locale|' platform/intl/icu/source/i18n/digitlst.cpp
+	vsed -i 's|NSS_ALLOW_SSLKEYLOGFILE=1|NSS_ALLOW_SSLKEYLOGFILE=0|' \
+		platform/config/external/nss/Makefile.in
+	vsed -i 's|enable_sslkeylogfile==1|enable_sslkeylogfile==0|' \
+		platform/security/nss/lib/ssl/ssl.gyp
 }
 
 do_build() {
@@ -63,6 +65,7 @@ do_install() {
 	ln -sf palemoon ${DESTDIR}/usr/lib/palemoon/palemoon-bin
 
 	# Remove the devel and etc
-	rm -rf ${DESTDIR}/usr/{include,lib/palemoon-devel,share/idl}
-	rm -rf ${DESTDIR}/usr/lib/palemoon/browser/{searchplugins,defaults}
+	rm -r ${DESTDIR}/usr/{include,lib/palemoon-devel,share/idl}
+	rm -r ${DESTDIR}/usr/lib/palemoon/browser/{defaults,icons,searchplugins}
+	rm ${DESTDIR}/usr/lib/palemoon/run-mozilla.sh
 }
