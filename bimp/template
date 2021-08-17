@@ -1,6 +1,6 @@
 # Template file for 'bimp'
 pkgname=bimp
-version=2.5
+version=2.6
 revision=1
 build_style=gnu-makefile
 wrksrc="gimp-plugin-bimp-${version}"
@@ -11,7 +11,7 @@ maintainer="biopsin <biopsin@gmail.com>"
 license="GPL-2.0-or-later"
 homepage="https://alessandrofrancesconi.it/projects/bimp/"
 distfiles="https://github.com/alessandrofrancesconi/gimp-plugin-bimp/archive/v${version}.tar.gz"
-checksum=a2e1d3e2eeb81f87fa8ed56027b7015a42bf26bf6f32e73d2777c07750ca89ef
+checksum=a8abef0f432e9fc8188dc4e8bdceab9a822641f8b8119f4feb70cc51457cf884
 
 do_build() {
 	# Todo fix cross
