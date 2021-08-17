@@ -23,6 +23,7 @@ ac_add_options --disable-gconf
 ac_add_options --disable-dbus
 ac_add_options --disable-elf-hack
 ac_add_options --disable-pulseaudio
+ac_add_options --disable-webspeech
 ac_add_options --disable-url-classifier
 ac_add_options --disable-crashreporter
 ac_add_options --disable-parental-controls
