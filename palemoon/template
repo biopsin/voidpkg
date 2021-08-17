@@ -1,66 +1,69 @@
 # Template file for 'Pale Moon'
 pkgname=palemoon
 version=29.3.0
-revision=1
+revision=4
+
 _uxpver=20210719
+
 wrksrc="pale-moon"
 hostmakedepends="curl autoconf213 unzip zip pkg-config perl python yasm tar which"
-makedepends="python-devel libatomic-devel gtk+-devel libXt-devel
- alsa-lib-devel ffmpeg-devel libvpx-devel libpng-devel libdav1d-devel"
+makedepends="python-devel libatomic-devel gtk+-devel libXt-devel alsa-lib-devel
+ libvpx-devel ffmpeg-devel libpng-devel"
 depends="desktop-file-utils hicolor-icon-theme mime-types"
 short_desc="UXP-based web browser"
 maintainer="biopsin <biopsin@yahoo.no>"
 license="MPL-2.0, GPL-2.0-or-later, LGPL-2.1-or-later"
 homepage="https://www.palemoon.org"
 distfiles="https://repo.palemoon.org/MoonchildProductions/Pale-Moon/archive/${version}_Release.tar.gz"
-checksum=8fbb36e032a6fbb9eb813c9baef3262ca80f8bbd4ae75bac607e70e549a31f2f
+checksum=3dc992ff6eef5b4fde5573c609932780906630742febaff4fbf8bf3a7ed3ff7f
 python_version=2
 lib32disabled=yes
 
 post_extract() {
-    [ ! -f "${XBPS_SRCDISTDIR}/${pkgname}-${version}/RELBASE_${_uxpver}.tar.gz" ] && \
-        curl https://repo.palemoon.org/MoonchildProductions/UXP/archive/RELBASE_${_uxpver}.tar.gz \
-        -O ${XBPS_SRCDISTDIR}/$${pkgname}-${version}
-    tar --strip-components=1 -xvzf \
-        ${XBPS_SRCDISTDIR}/${pkgname}-${version}/RELBASE_${_uxpver}.tar.gz -C platform/
-
-    cp "${FILESDIR}/mozconfig" "${wrksrc}/.mozconfig"
-    mkdir -p /usr/lib/palemoon
+	[ ! -f "${XBPS_SRCDISTDIR}/${pkgname}-${version}/RELBASE_${_uxpver}.tar.gz" ] && \
+		curl https://repo.palemoon.org/MoonchildProductions/UXP/archive/RELBASE_${_uxpver}.tar.gz \
+		-O ${XBPS_SRCDISTDIR}/$${pkgname}-${version}
+	tar --strip-components=1 -xvzf \
+		${XBPS_SRCDISTDIR}/${pkgname}-${version}/RELBASE_${_uxpver}.tar.gz -C platform/
 }
 
 do_patch() {
-    for p in ${FILESDIR}/*.patch; do
-        patch -p0 -i $p
-    done
+	cp "${FILESDIR}/mozconfig" "${wrksrc}/.mozconfig"
+	mkdir -p /usr/lib/palemoon
+
+	for p in ${FILESDIR}/*.patch; do
+		patch -p0 -i $p
+	done
 }
 
 post_configure() {
-    vsed 's|xlocale|locale|' -i platform/intl/icu/source/i18n/digitlst.cpp
-    vsed 's|NSS_ALLOW_SSLKEYLOGFILE=1|NSS_ALLOW_SSLKEYLOGFILE=0|' -i platform/config/external/nss/Makefile.in
-    vsed 's|enable_sslkeylogfile==1|enable_sslkeylogfile==0|' -i platform/security/nss/lib/ssl/ssl.gyp
+	vsed 's|xlocale|locale|' -i platform/intl/icu/source/i18n/digitlst.cpp
+	vsed 's|NSS_ALLOW_SSLKEYLOGFILE=1|NSS_ALLOW_SSLKEYLOGFILE=0|' -i platform/config/external/nss/Makefile.in
+	vsed 's|enable_sslkeylogfile==1|enable_sslkeylogfile==0|' -i platform/security/nss/lib/ssl/ssl.gyp
 }
 
 do_build() {
-    export LDFLAGS+=" -Wl,-rpath=/usr/lib/palemoon"
-    export MOZ_MAKE_FLAGS="${makejobs}"
+	export CPPFLAGS="${CPPFLAGS} -O2 -Wno-format-overflow"
+	export LDFLAGS+=" -Wl,-rpath=/usr/lib/palemoon"
+	export MOZ_MAKE_FLAGS="${makejobs}"
 
-    ./mach build
+	./mach build
 }
 
 do_install() {
-    DESTDIR="$DESTDIR" ./mach install
+	DESTDIR="$DESTDIR" ./mach install
 
-    for i in 16x16 32x32 48x48; do
-        vinstall ${wrksrc}/palemoon/branding/unstable/default${i%x*}.png 644 \
-            usr/share/icons/hicolor/${i}/apps palemoon.png
-    done
+	for i in 16x16 32x32 48x48; do
+		vinstall ${wrksrc}/palemoon/branding/unstable/default${i%x*}.png 644 \
+			usr/share/icons/hicolor/${i}/apps palemoon.png
+	done
 
-    vinstall ${wrksrc}/palemoon/branding/official/palemoon.desktop 644 usr/share/applications
+	vinstall ${wrksrc}/palemoon/branding/official/palemoon.desktop 644 usr/share/applications
 
-    # Don't want the development or bundle stuff
-    rm -rf ${DESTDIR}/usr/{include,lib/palemoon-devel,share/idl}
-    rm -rf ${DESTDIR}/usr/lib/palemoon/browser/{searchplugins,defaults}
+	# https://bugzilla.mozilla.org/show_bug.cgi?id=658850
+	ln -sf palemoon ${DESTDIR}/usr/lib/palemoon/palemoon-bin
 
-    # https://bugzilla.mozilla.org/show_bug.cgi?id=658850
-    ln -sf palemoon ${DESTDIR}/usr/lib/palemoon/palemoon-bin
+	# Remove the devel and etc
+	rm -rf ${DESTDIR}/usr/{include,lib/palemoon-devel,share/idl}
+	rm -rf ${DESTDIR}/usr/lib/palemoon/browser/{searchplugins,defaults}
 }
