@@ -12,7 +12,7 @@ distfiles="https://github.com/OpenICC/${pkgname}/archive/${version}.tar.gz"
 checksum="67dbf2dcc4ae67fde48b48630980c1fa6f89fda5810347f616ec85094c274055"
 
 post_extract() {
-	sed -i '/CC.*-o/s/$/ $(LDFLAGS)/' Makefile
+	vsed -i '/CC.*-o/s/$/ $(LDFLAGS)/' Makefile
 }
 
 do_install() {
