@@ -1,0 +1,84 @@
+From 83cb6c15d3ee5574e9e743cf15a9e353c2bd22e1 Mon Sep 17 00:00:00 2001
+From: Ali MJ Al-Nasrawy <alimjalnasrawy@gmail.com>
+Date: Sun, 15 Mar 2020 00:32:12 +0300
+Subject: [PATCH] always use range requests
+
+Send "Range: bytes=0-" with the first http request to inform the server
+of range support by the client.
+
+As per RFC 7233, server MUST ignore the header (not request!) if it
+doesn't support range requests or the specified unit. So, this should
+have no side effects.
+
+Fixes GH-1576.
+---
+ src/HttpRequest.cc      | 3 +++
+ test/HttpRequestTest.cc | 6 ++++++
+ 2 files changed, 9 insertions(+)
+
+diff --git a/src/HttpRequest.cc b/src/HttpRequest.cc
+index b5fb4f863..d57d2f0dd 100644
+--- a/src/HttpRequest.cc
++++ b/src/HttpRequest.cc
+@@ -213,6 +213,9 @@ std::string HttpRequest::createRequest()
+     }
+     builtinHds.emplace_back("Range:", rangeHeader);
+   }
++  else if (!segment_ && getMethod() == "GET") {
++    builtinHds.emplace_back("Range:", "bytes=0-");
++  }
+   if (proxyRequest_) {
+     if (request_->isKeepAliveEnabled() || request_->isPipeliningEnabled()) {
+       builtinHds.emplace_back("Connection:", "Keep-Alive");
+diff --git a/test/HttpRequestTest.cc b/test/HttpRequestTest.cc
+index 432852b06..28bd1d68b 100644
+--- a/test/HttpRequestTest.cc
++++ b/test/HttpRequestTest.cc
+@@ -527,6 +527,7 @@ void HttpRequestTest::testCreateRequest_query()
+       "Pragma: no-cache\r\n"
+       "Cache-Control: no-cache\r\n"
+       "Connection: close\r\n"
++      "Range: bytes=0-\r\n"
+       "\r\n";
+ 
+   CPPUNIT_ASSERT_EQUAL(expectedText, httpRequest.createRequest());
+@@ -624,6 +625,7 @@ void HttpRequestTest::testCreateRequest_wantDigest()
+                              "Pragma: no-cache\r\n"
+                              "Cache-Control: no-cache\r\n"
+                              "Connection: close\r\n"
++                             "Range: bytes=0-\r\n"
+                              "Want-Digest: " +
+                              wantDigest +
+                              "\r\n"
+@@ -781,6 +783,7 @@ void HttpRequestTest::testUserAgent()
+                              "Pragma: no-cache\r\n"
+                              "Cache-Control: no-cache\r\n"
+                              "Connection: close\r\n"
++                             "Range: bytes=0-\r\n"
+                              "\r\n";
+ 
+   CPPUNIT_ASSERT_EQUAL(expectedText, httpRequest.createRequest());
+@@ -818,6 +821,7 @@ void HttpRequestTest::testAddHeader()
+                              "Pragma: no-cache\r\n"
+                              "Cache-Control: no-cache\r\n"
+                              "Connection: close\r\n"
++                             "Range: bytes=0-\r\n"
+                              "X-ARIA2: v0.13\r\n"
+                              "X-ARIA2-DISTRIBUTE: enabled\r\n"
+                              "Accept: text/html\r\n"
+@@ -847,6 +851,7 @@ void HttpRequestTest::testAcceptMetalink()
+       "Pragma: no-cache\r\n"
+       "Cache-Control: no-cache\r\n"
+       "Connection: close\r\n"
++      "Range: bytes=0-\r\n"
+       "\r\n";
+ 
+   CPPUNIT_ASSERT_EQUAL(expectedText, httpRequest.createRequest());
+@@ -876,6 +881,7 @@ void HttpRequestTest::testEnableAcceptEncoding()
+                                  "Pragma: no-cache\r\n"
+                                  "Cache-Control: no-cache\r\n"
+                                  "Connection: close\r\n"
++                                 "Range: bytes=0-\r\n"
+                                  "\r\n";
+ 
+   std::string expectedText = expectedTextHead;

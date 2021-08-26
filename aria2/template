@@ -1,0 +1,24 @@
+# Template file for 'aria2'
+pkgname=aria2
+version=1.36.0
+revision=1
+build_style=gnu-configure
+configure_args="--with-openssl --with-libexpat --without-gnutls
+ --with-ca-bundle=/etc/ssl/certs/ca-certificates.crt"
+hostmakedepends="pkg-config"
+makedepends="c-ares-devel expat-devel gmp-devel openssl-devel sqlite-devel
+ zlib-devel"
+depends="ca-certificates"
+checkdepends="libcppunit-devel"
+short_desc="Lightweight multi-protocol/multi-source command-line download utility"
+maintainer="Orphaned <orphan@voidlinux.org>"
+license="GPL-2.0-or-later"
+homepage="https://aria2.github.io/"
+changelog="https://raw.githubusercontent.com/aria2/aria2/master/NEWS"
+distfiles="https://github.com/aria2/aria2/releases/download/release-${version}/aria2-${version}.tar.xz"
+checksum=58d1e7608c12404f0229a3d9a4953d0d00c18040504498b483305bcb3de907a5
+patch_args="-p1"
+
+post_install() {
+	rm -rf ${DESTDIR}/usr/share/locale
+}

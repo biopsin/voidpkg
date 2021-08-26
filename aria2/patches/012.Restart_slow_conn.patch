@@ -1,0 +1,26 @@
+From 469f70252bfec2e59188e86f092aa3ef68798d68 Mon Sep 17 00:00:00 2001
+From: Klaus Frank <agowa338@users.noreply.github.com>
+Date: Mon, 23 Nov 2020 22:49:43 +0100
+Subject: [PATCH] Restart slow connections
+
+Restart connection on low speed dropout.
+
+Before this pr the number of open connections to a server will slowly decrease until there are none left.
+After this pr aria2c will restart all connections that were slower than the limit and therefore terminated.
+---
+ src/DownloadCommand.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/DownloadCommand.cc b/src/DownloadCommand.cc
+index 2db41e463..f49eb807b 100644
+--- a/src/DownloadCommand.cc
++++ b/src/DownloadCommand.cc
+@@ -306,7 +306,7 @@ void DownloadCommand::checkLowestDownloadSpeed() const
+           startupIdleTime_) {
+     int nowSpeed = peerStat_->calculateDownloadSpeed();
+     if (nowSpeed <= lowestDownloadSpeedLimit_) {
+-      throw DL_ABORT_EX2(fmt(EX_TOO_SLOW_DOWNLOAD_SPEED, nowSpeed,
++      throw DL_RETRY_EX2(fmt(EX_TOO_SLOW_DOWNLOAD_SPEED, nowSpeed,
+                              lowestDownloadSpeedLimit_,
+                              getRequest()->getHost().c_str()),
+                          error_code::TOO_SLOW_DOWNLOAD_SPEED);

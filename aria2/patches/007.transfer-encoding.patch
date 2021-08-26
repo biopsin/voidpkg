@@ -1,0 +1,101 @@
+From 2924a029abacca39d8761fa4573ba0efe00a2fd0 Mon Sep 17 00:00:00 2001
+From: Ali MJ Al-Nasrawy <alimjalnasrawy@gmail.com>
+Date: Sun, 15 Mar 2020 00:12:14 +0300
+Subject: [PATCH] transfer-encoding: support segmented download
+
+Partial content responses (code 206) with content-range works at higher
+level than content-length and transfer-encoding and is totally
+compatible with both. In other words, transfer-encoding specifies the
+encoding in which the request part is sent  while content-range species
+the position of this part within the whole "representation".
+
+Also, do range validation test for the response.
+
+This parially reverts 5ccd5b6.
+
+Fixes GH-1576.
+---
+ src/HttpHeaderProcessor.cc      | 5 +----
+ src/HttpResponse.cc             | 2 +-
+ src/HttpResponseCommand.cc      | 3 ---
+ test/HttpHeaderProcessorTest.cc | 2 +-
+ test/HttpResponseTest.cc        | 4 ++--
+ 5 files changed, 5 insertions(+), 11 deletions(-)
+
+diff --git a/src/HttpHeaderProcessor.cc b/src/HttpHeaderProcessor.cc
+index 53f061e6f..566c4ff71 100644
+--- a/src/HttpHeaderProcessor.cc
++++ b/src/HttpHeaderProcessor.cc
+@@ -452,12 +452,9 @@ bool HttpHeaderProcessor::parse(const unsigned char* data, size_t length)
+   // are present, delete content-length and content-range.  RFC 7230
+   // says that sender must not send both transfer-encoding and
+   // content-length.  If both present, transfer-encoding overrides
+-  // content-length.  There is no text about transfer-encoding and
+-  // content-range.  But there is no reason to send transfer-encoding
+-  // when range is set.
++  // content-length.
+   if (result_->defined(HttpHeader::TRANSFER_ENCODING)) {
+     result_->remove(HttpHeader::CONTENT_LENGTH);
+-    result_->remove(HttpHeader::CONTENT_RANGE);
+   }
+ 
+   return true;
+diff --git a/src/HttpResponse.cc b/src/HttpResponse.cc
+index 500cd64e8..68fd7f1b3 100644
+--- a/src/HttpResponse.cc
++++ b/src/HttpResponse.cc
+@@ -74,7 +74,7 @@ void HttpResponse::validateResponse() const
+   switch (statusCode) {
+   case 200: // OK
+   case 206: // Partial Content
+-    if (!httpHeader_->defined(HttpHeader::TRANSFER_ENCODING)) {
++    {
+       // compare the received range against the requested range
+       auto responseRange = httpHeader_->getRange();
+       if (!httpRequest_->isRangeSatisfied(responseRange)) {
+diff --git a/src/HttpResponseCommand.cc b/src/HttpResponseCommand.cc
+index 6e2a01d45..62d410daa 100644
+--- a/src/HttpResponseCommand.cc
++++ b/src/HttpResponseCommand.cc
+@@ -272,9 +272,6 @@ bool HttpResponseCommand::executeInternal()
+     // update last modified time
+     updateLastModifiedTime(httpResponse->getLastModifiedTime());
+ 
+-    // If both transfer-encoding and total length is specified, we
+-    // should have ignored total length.  In this case, we can not do
+-    // segmented downloading
+     if (totalLength == 0 || shouldInflateContentEncoding(httpResponse.get())) {
+       // we ignore content-length when inflate is required
+       fe->setLength(0);
+diff --git a/test/HttpHeaderProcessorTest.cc b/test/HttpHeaderProcessorTest.cc
+index c1d6cca06..6ef82fa57 100644
+--- a/test/HttpHeaderProcessorTest.cc
++++ b/test/HttpHeaderProcessorTest.cc
+@@ -224,7 +224,7 @@ void HttpHeaderProcessorTest::testGetHttpResponseHeader_teAndCl()
+   CPPUNIT_ASSERT_EQUAL(std::string("chunked"),
+                        httpHeader->find(HttpHeader::TRANSFER_ENCODING));
+   CPPUNIT_ASSERT(!httpHeader->defined(HttpHeader::CONTENT_LENGTH));
+-  CPPUNIT_ASSERT(!httpHeader->defined(HttpHeader::CONTENT_RANGE));
++  CPPUNIT_ASSERT(httpHeader->defined(HttpHeader::CONTENT_RANGE));
+ }
+ 
+ void HttpHeaderProcessorTest::testBeyondLimit()
+diff --git a/test/HttpResponseTest.cc b/test/HttpResponseTest.cc
+index c1b4ef43f..55e7975e6 100644
+--- a/test/HttpResponseTest.cc
++++ b/test/HttpResponseTest.cc
+@@ -451,12 +451,12 @@ void HttpResponseTest::testValidateResponse_chunked()
+                                     "bytes 0-10485760/10485761");
+   httpResponse.getHttpHeader()->put(HttpHeader::TRANSFER_ENCODING, "chunked");
+ 
+-  // if transfer-encoding is specified, then range validation is skipped.
++  // if transfer-encoding is specified, range validation is still necessary.
+   try {
+     httpResponse.validateResponse();
++    CPPUNIT_FAIL("exception must be thrown.");
+   }
+   catch (Exception& e) {
+-    CPPUNIT_FAIL("exception must not be thrown.");
+   }
+ }
+ 
