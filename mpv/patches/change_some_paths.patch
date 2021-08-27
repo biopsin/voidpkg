@@ -1,0 +1,323 @@
+From 262dd0bf06ed693cd9bc4291cfe9dcd95f9048c7 Mon Sep 17 00:00:00 2001
+From: Dudemanguy <random342@airmail.cc>
+Date: Fri, 16 Oct 2020 11:34:17 -0500
+Subject: [PATCH] path: use XDG cache and XDG data dirs by default
+
+Currently, mpv stores some non-config data in ~/.config by default. For
+users that back up their dotconfigs, this can be annoying. This reworks
+the path logic to make use of the XDG_CACHE_HOME and XDG_DATA_HOME
+environment variables with the appropriate fallbacks if they don't
+exist.
+
+mpv's watch_later directory is now stored in the data directory
+(~/.local/share/mpv for most users). This part of the change only
+affects *nix users. Other platforms will still use the config directory
+since the XDG paradigm doesn't exist there. In a separate but related
+change, the --cache-dir options defaults to the cache directory
+(~/.cache/mpv for most users). The change in where to store cache does
+affect all platforms. For those that aren't on *nix systems, the default
+cache directory is the same as their config directory.
+
+Both of these new directories are only used if the user is using
+XDG_CONFIG_HOME (or the default ~/.config/mpv fallback). If the user is
+using the old compatibility path (~/.mpv) or has forced a config
+directory (either using the --configdir option or the MPV_HOME
+environment variable), then everything is stored in the config directory
+like before and there is no splitting of data.
+
+Internally, this change modifies the mp_find_user_config_file and
+mp_mk_config_dir functions to make them slightly more generic (now named
+mp_find_user_file and mp_mk_user_dir respectively).
+---
+ DOCS/man/mpv.rst           |  2 +-
+ DOCS/man/options.rst       |  6 ++----
+ demux/cache.c              |  9 +++++----
+ options/path.c             | 18 ++++++++++++------
+ options/path.h             | 12 ++++++------
+ osdep/path-unix.c          | 24 +++++++++++++++++++++++-
+ osdep/path-uwp.c           |  4 +++-
+ osdep/path-win.c           | 10 ++++++++--
+ osdep/path.h               |  7 +++++++
+ player/configfiles.c       |  6 +++---
+ 11 files changed, 73 insertions(+), 28 deletions(-)
+
+diff --git a/DOCS/man/mpv.rst b/DOCS/man/mpv.rst
+index 28dddce183..3ef7ecbb46 100644
+--- a/DOCS/man/mpv.rst
++++ b/DOCS/man/mpv.rst
+@@ -1554,7 +1554,7 @@ For Windows-specifics, see `FILES ON WINDOWS`_ section.
+ 
+     See `Script location`_ for details.
+ 
+-``~/.config/mpv/watch_later/``
++``~/.local/share/mpv/watch_later/``
+     Contains temporary config files needed for resuming playback of files with
+     the watch later feature. See for example the ``Q`` key binding, or the
+     ``quit-watch-later`` input command.
+diff --git a/DOCS/man/options.rst b/DOCS/man/options.rst
+index 3d6f70ebfd..d555077b6c 100644
+--- a/DOCS/man/options.rst
++++ b/DOCS/man/options.rst
+@@ -744,7 +744,7 @@ Program Behavior
+     The directory in which to store the "watch later" temporary files.
+ 
+     The default is a subdirectory named "watch_later" underneath the
+-    config directory (usually ``~/.config/mpv/``).
++    local data directory (usually ``~/.local/share/mpv/``).
+ 
+ ``--dump-stats=<filename>``
+     Write certain statistics to the given file. The file is truncated on
+@@ -4558,8 +4558,6 @@ Cache
+     This makes sense only with ``--cache``. If the normal cache is disabled,
+     this option is ignored.
+ 
+-    You need to set ``--cache-dir`` to use this.
+-
+     The cache file is append-only. Even if the player appears to prune data, the
+     file space freed by it is not reused. The cache file is deleted when
+     playback is closed.
+@@ -4582,7 +4580,7 @@ Cache
+     continue to use the cache file that was opened first.
+ 
+ ``--cache-dir=<path>``
+-    Directory where to create temporary files (default: none).
++    Directory where to create temporary files (usually ``~/.cache/mpv``).
+ 
+     Currently, this is used for ``--cache-on-disk`` only.
+ 
+diff --git a/demux/cache.c b/demux/cache.c
+index f48598807c..8414843c39 100644
+--- a/demux/cache.c
++++ b/demux/cache.c
+@@ -100,10 +100,11 @@ struct demux_cache *demux_cache_create(struct mpv_global *global,
+     cache->fd = -1;
+ 
+     char *cache_dir = cache->opts->cache_dir;
+-    if (!(cache_dir && cache_dir[0])) {
+-        MP_ERR(cache, "No cache data directory supplied.\n");
+-        goto fail;
+-    }
++    if (!(cache_dir && cache_dir[0]))
++        cache_dir = mp_find_user_file(NULL, global, "cache", "");
++
++    if (!mp_path_exists(cache_dir))
++        mp_mk_user_dir(global, "cache", cache_dir);
+ 
+     cache->filename = mp_path_join(cache, cache_dir, "mpv-cache-XXXXXX.dat");
+     cache->fd = mp_mkostemps(cache->filename, 4, O_CLOEXEC);
+diff --git a/options/path.c b/options/path.c
+index 9c996ce664..46d981eab6 100644
+--- a/options/path.c
++++ b/options/path.c
+@@ -99,15 +99,21 @@ static const char *mp_get_platform_path(void *talloc_ctx,
+     return NULL;
+ }
+ 
+-char *mp_find_user_config_file(void *talloc_ctx, struct mpv_global *global,
+-                               const char *filename)
++char *mp_find_user_file(void *talloc_ctx, struct mpv_global *global,
++                        const char *type, const char *filename)
+ {
+     void *tmp = talloc_new(NULL);
+-    char *res = (char *)mp_get_platform_path(tmp, global, config_dirs[0]);
++    char *res;
++    /* If the user forces a configdir, always return this path. */
++    if (global->configdir) {
++        res = (char *)mp_get_platform_path(tmp, global, config_dirs[0]);
++    } else {
++        res = (char *)mp_get_platform_path(tmp, global, type);
++    }
+     if (res)
+         res = mp_path_join(talloc_ctx, res, filename);
+     talloc_free(tmp);
+-    MP_DBG(global, "config path: '%s' -> '%s'\n", filename, res ? res : "-");
++    MP_DBG(global, "path: '%s' -> '%s'\n", filename, res ? res : "-");
+     return res;
+ }
+ 
+@@ -375,9 +381,9 @@ void mp_mkdirp(const char *dir)
+     talloc_free(path);
+ }
+ 
+-void mp_mk_config_dir(struct mpv_global *global, char *subdir)
++void mp_mk_user_dir(struct mpv_global *global, const char *type, char *subdir)
+ {
+-    char *dir = mp_find_user_config_file(NULL, global, subdir);
++    char *dir = mp_find_user_file(NULL, global, type, subdir);
+     if (dir)
+         mp_mkdirp(dir);
+     talloc_free(dir);
+diff --git a/options/path.h b/options/path.h
+index 19f4fb5909..b642558825 100644
+--- a/options/path.h
++++ b/options/path.h
+@@ -34,11 +34,11 @@ void mp_init_paths(struct mpv_global *global, struct MPOpts *opts);
+ char *mp_find_config_file(void *talloc_ctx, struct mpv_global *global,
+                           const char *filename);
+ 
+-// Like mp_find_config_file(), but search only the local writable user config
+-// dir. Also, this returns a result even if the file does not exist. Calling
+-// it with filename="" is equivalent to retrieving the user config dir.
+-char *mp_find_user_config_file(void *talloc_ctx, struct mpv_global *global,
+-                               const char *filename);
++// Search for local writable user files (config, data, or cache). This returns
++// a result even if the file does not exist. Calling it with filename="" is
++// equivalent to retrieving the user config dir.
++char *mp_find_user_file(void *talloc_ctx, struct mpv_global *global,
++                        const char *type, const char *filename);
+ 
+ // Find all instances of the given config file. Paths are returned in order
+ // from lowest to highest priority. filename can contain multiple names
+@@ -90,6 +90,6 @@ bool mp_is_url(bstr path);
+ bstr mp_split_proto(bstr path, bstr *out_url);
+ 
+ void mp_mkdirp(const char *dir);
+-void mp_mk_config_dir(struct mpv_global *global, char *subdir);
++void mp_mk_user_dir(struct mpv_global *global, const char *type, char *subdir);
+ 
+ #endif /* MPLAYER_PATH_H */
+diff --git a/osdep/path-unix.c b/osdep/path-unix.c
+index d9a49ab06d..80cce4051e 100644
+--- a/osdep/path-unix.c
++++ b/osdep/path-unix.c
+@@ -27,11 +27,15 @@ static pthread_once_t path_init_once = PTHREAD_ONCE_INIT;
+ 
+ static char mpv_home[512];
+ static char old_home[512];
++static char mpv_cache[512];
++static char mpv_data[512];
+ 
+ static void path_init(void)
+ {
+     char *home = getenv("HOME");
+     char *xdg_dir = getenv("XDG_CONFIG_HOME");
++    char *xdg_cache = getenv("XDG_CACHE_HOME");
++    char *xdg_data = getenv("XDG_DATA_HOME");
+ 
+     if (xdg_dir && xdg_dir[0]) {
+         snprintf(mpv_home, sizeof(mpv_home), "%s/mpv", xdg_dir);
+@@ -43,10 +47,24 @@ static void path_init(void)
+     if (home && home[0])
+         snprintf(old_home, sizeof(old_home), "%s/.mpv", home);
+ 
++    if (xdg_cache && xdg_cache[0]) {
++        snprintf(mpv_cache, sizeof(mpv_cache), "%s/mpv", xdg_cache);
++    } else if (home && home[0]) {
++        snprintf(mpv_cache, sizeof(mpv_cache), "%s/.cache/mpv", home);
++    }
++
++    if (xdg_data && xdg_data[0]) {
++        snprintf(mpv_data, sizeof(mpv_data), "%s/mpv", xdg_data);
++    } else if (home && home[0]) {
++        snprintf(mpv_data, sizeof(mpv_data), "%s/.local/share/mpv", home);
++    }
++
+     // If the old ~/.mpv exists, and the XDG config dir doesn't, use the old
+-    // config dir only.
++    // config dir only. Also do not use XDG cache or XDG data directories.
+     if (mp_path_exists(old_home) && !mp_path_exists(mpv_home)) {
+         snprintf(mpv_home, sizeof(mpv_home), "%s", old_home);
++        snprintf(mpv_cache, sizeof(mpv_cache), "%s", old_home);
++        snprintf(mpv_data, sizeof(mpv_data), "%s", old_home);
+         old_home[0] = '\0';
+     }
+ }
+@@ -58,6 +76,10 @@ const char *mp_get_platform_path_unix(void *talloc_ctx, const char *type)
+         return mpv_home;
+     if (strcmp(type, "old_home") == 0)
+         return old_home;
++    if (strcmp(type, "cache") == 0)
++        return mpv_cache;
++    if (strcmp(type, "data") == 0)
++        return mpv_data;
+     if (strcmp(type, "global") == 0)
+         return MPV_CONFDIR;
+     if (strcmp(type, "desktop") == 0)
+diff --git a/osdep/path-uwp.c b/osdep/path-uwp.c
+index 7eafb03a98..7a8cc3e416 100644
+--- a/osdep/path-uwp.c
++++ b/osdep/path-uwp.c
+@@ -26,7 +26,9 @@ WINBASEAPI DWORD WINAPI GetCurrentDirectoryW(DWORD nBufferLength, LPWSTR lpBuffe
+ 
+ const char *mp_get_platform_path_uwp(void *talloc_ctx, const char *type)
+ {
+-    if (strcmp(type, "home") == 0) {
++    if (strcmp(type, "home") == 0 || strcmp(type, "cache") == 0 ||
++        strcmp(type, "data") == 0)
++    {
+         wchar_t homeDir[_MAX_PATH];
+         if (GetCurrentDirectoryW(_MAX_PATH, homeDir) != 0)
+             return mp_to_utf8(talloc_ctx, homeDir);
+diff --git a/osdep/path-win.c b/osdep/path-win.c
+index 8f289ff83a..05026d9e13 100644
+--- a/osdep/path-win.c
++++ b/osdep/path-win.c
+@@ -85,11 +85,17 @@ const char *mp_get_platform_path_win(void *talloc_ctx, const char *type)
+ {
+     pthread_once(&path_init_once, path_init);
+     if (portable_path) {
+-        if (strcmp(type, "home") == 0)
++        if (strcmp(type, "home") == 0 || strcmp(type, "cache") == 0 ||
++            strcmp(type, "data") == 0)
++        {
+             return portable_path;
++		}
+     } else {
+-        if (strcmp(type, "home") == 0)
++        if (strcmp(type, "home") == 0 || strmcp(type, "cache") == 0 ||
++            strcmp(type, "data") == 0)
++        {
+             return mp_get_win_app_dir(talloc_ctx);
++		}
+         if (strcmp(type, "exe_dir") == 0)
+             return mp_get_win_exe_dir(talloc_ctx);
+         // Not really true, but serves as a way to return a lowest-priority dir.
+diff --git a/osdep/path.h b/osdep/path.h
+index c082c1ee16..e4fab70400 100644
+--- a/osdep/path.h
++++ b/osdep/path.h
+@@ -11,6 +11,13 @@
+ //  "global"        the least priority, global config file location
+ //  "desktop"       path to desktop contents
+ //
++//  These additional type values are also defined. It is only used if
++//  the native mpv-specific user config dir is defined and only has any
++//  special meaning on unix platforms (elsewhere, the user config dir is
++//  returned).
++//  "cache"         path to local user cache files
++//  "data"          path to local user data files
++//
+ // It is allowed to return a static string, so the caller must set talloc_ctx
+ // to something other than NULL to avoid memory leaks.
+ typedef const char *(*mp_get_platform_path_cb)(void *talloc_ctx, const char *type);
+diff --git a/player/configfiles.c b/player/configfiles.c
+index 0150133dbd..f3a4ef3d43 100644
+--- a/player/configfiles.c
++++ b/player/configfiles.c
+@@ -63,7 +63,7 @@ void mp_parse_cfgfiles(struct MPContext *mpctx)
+ {
+     struct MPOpts *opts = mpctx->opts;
+ 
+-    mp_mk_config_dir(mpctx->global, "");
++    mp_mk_user_dir(mpctx->global, "home", "");
+ 
+     char *p1 = mp_get_user_path(NULL, mpctx->global, "~~home/");
+     char *p2 = mp_get_user_path(NULL, mpctx->global, "~~old_home/");
+@@ -226,7 +226,7 @@ static char *mp_get_playback_resume_config_filename(struct MPContext *mpctx,
+ 
+     if (!mpctx->cached_watch_later_configdir) {
+         mpctx->cached_watch_later_configdir =
+-            mp_find_user_config_file(mpctx, mpctx->global, MP_WATCH_LATER_CONF);
++            mp_find_user_file(mpctx, mpctx->global, "data", MP_WATCH_LATER_CONF);
+     }
+ 
+     if (mpctx->cached_watch_later_configdir)
+@@ -349,7 +349,7 @@ void mp_write_watch_later_conf(struct MPContext *mpctx)
+     if (!conffile)
+         goto exit;
+ 
+-    mp_mk_config_dir(mpctx->global, mpctx->cached_watch_later_configdir);
++    mp_mk_user_dir(mpctx->global, "data", mpctx->cached_watch_later_configdir);
+ 
+     MP_INFO(mpctx, "Saving state.\n");
+ 
