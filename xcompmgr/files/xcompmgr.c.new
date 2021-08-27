@@ -128,7 +128,7 @@ static Atom        winUtilAtom;
 static Atom        winSplashAtom;
 static Atom        winDialogAtom;
 static Atom        winNormalAtom;
-static Atom        winTootipAtom;
+static Atom        winTooltipAtom;
 static Atom        winComboAtom;
 static Atom        winNotificationAtom;
 
@@ -555,7 +555,7 @@ root_tile (Display *dpy) {
     pa.repeat = True;
     picture = XRenderCreatePicture (dpy, pixmap,
                                                             XRenderFindVisualFormat (dpy,
-                                                                                                            DefaultVisual (dpy, scr)),
+															DefaultVisual (dpy, scr)),
                                                             CPRepeat, &pa);
     if (fill) {
         XRenderColor    c;
@@ -581,7 +581,7 @@ paint_root (Display *dpy) {
 static XserverRegion
 win_extents (Display *dpy, win *w) {
     XRectangle r;
-    Bool draw_shadow=True;
+    Bool draw_shadow = True;
 
     r.x = w->a.x;
     r.y = w->a.y;
@@ -593,12 +593,12 @@ win_extents (Display *dpy, win *w) {
             ((*((long int *)w->a.visual) & CopyFromParent) == CopyFromParent)) {
                 draw_shadow = True; // don't ignore: alt+tab, dmenu
             } else if (w->mode == WINDOW_ARGB ||
-                    w->windowType==winTootipAtom ||
-                    w->windowType==winComboAtom ||
-                    w->windowType==winNotificationAtom) {
-                        draw_shadow = True; // don't ignore:, dunst, toolkit windows aso..
+					w->windowType == winTooltipAtom ||
+                    w->windowType == winComboAtom ||
+					w->windowType == winNotificationAtom) {
+						draw_shadow = True; // don't ignore: dunst, toolkit windows aso..
             } else if (w->windowType == 0) {
-                    draw_shadow = False; // ignore: unknown types..
+					draw_shadow = False; // ignore: unknown types..
             }
 
     if (compMode != CompSimple && !(w->windowType == winDockAtom && excludeDockShadows) && draw_shadow) {
@@ -677,7 +677,7 @@ paint_all (Display *dpy, XserverRegion region) {
                                                                         DefaultDepth (dpy, scr));
       rootBuffer = XRenderCreatePicture (dpy, rootPixmap,
                                                                         XRenderFindVisualFormat (dpy,
-                                                                                                                    DefaultVisual (dpy, scr)),
+																		DefaultVisual (dpy, scr)),
                                                                         0, NULL);
       XFreePixmap (dpy, rootPixmap);
     }
@@ -761,8 +761,8 @@ paint_all (Display *dpy, XserverRegion region) {
             XFixesSubtractRegion (dpy, region, region, w->borderSize);
             set_ignore (dpy, NextRequest (dpy));
             XRenderComposite (dpy, PictOpSrc, w->picture, None, rootBuffer,
-                                                0, 0, 0, 0,
-                                                x, y, wid, hei);
+																		0, 0, 0, 0,
+																		x, y, wid, hei);
         }
         if (!w->borderClip) {
             w->borderClip = XFixesCreateRegion (dpy, NULL, 0);
@@ -831,8 +831,8 @@ paint_all (Display *dpy, XserverRegion region) {
 #endif
             set_ignore (dpy, NextRequest (dpy));
             XRenderComposite (dpy, PictOpOver, w->picture, w->alphaPict, rootBuffer,
-                                                0, 0, 0, 0,
-                                                x, y, wid, hei);
+																		0, 0, 0, 0,
+																		x, y, wid, hei);
         }
         else if (w->mode == WINDOW_ARGB) {
             int x, y, wid, hei;
@@ -851,8 +851,8 @@ paint_all (Display *dpy, XserverRegion region) {
 #endif
             set_ignore (dpy, NextRequest (dpy));
             XRenderComposite (dpy, PictOpOver, w->picture, w->alphaPict, rootBuffer,
-                                                0, 0, 0, 0,
-                                                x, y, wid, hei);
+																		0, 0, 0, 0,
+																		x, y, wid, hei);
         }
         XFixesDestroyRegion (dpy, w->borderClip);
         w->borderClip = None;
@@ -864,9 +864,8 @@ paint_all (Display *dpy, XserverRegion region) {
     if (rootBuffer != rootPicture) {
         XFixesSetPictureClipRegion (dpy, rootBuffer, 0, 0, None);
         XRenderComposite (dpy, PictOpSrc, rootBuffer, None, rootPicture,
-                                            0, 0, 0, 0, 0, 0, root_width, root_height);
+																0, 0, 0, 0, 0, 0, root_width, root_height);
     }
-
     XFlush(dpy);
 }
 
@@ -935,7 +934,7 @@ map_win (Display *dpy, Window id, unsigned long sequence) {
 #endif
     w->damaged = 0;
 
-    if(w->windowType==0)
+    if(w->windowType == 0)
         w->windowType = determine_wintype (dpy, w->id);
 }
 
@@ -1009,8 +1008,8 @@ get_opacity_prop(Display *dpy, win *w, unsigned int def) {
 
     unsigned char *data;
     int result = XGetWindowProperty(dpy, w->id, opacityAtom, 0L, 1L, False,
-                                                                XA_CARDINAL, &actual, &format,
-                                                               &n, &left, &data);
+																	XA_CARDINAL, &actual, &format,
+																	&n, &left, &data);
     if (result == Success && data != NULL) {
         unsigned int i;
         memcpy (&i, data, sizeof (unsigned int));
@@ -1030,8 +1029,8 @@ get_wintype_prop(Display * dpy, Window w) {
 
     unsigned char *data;
     int result = XGetWindowProperty (dpy, w, winTypeAtom, 0L, 1L, False,
-                                                                XA_ATOM, &actual, &format,
-                                                                &n, &left, &data);
+																	XA_ATOM, &actual, &format,
+																	&n, &left, &data);
 
     if (result == Success && data != (unsigned char *)None) {
         Atom a;
@@ -1781,7 +1780,7 @@ main (int argc, char **argv) {
     winSplashAtom = XInternAtom (dpy, "_NET_WM_WINDOW_TYPE_SPLASH", False);
     winDialogAtom = XInternAtom (dpy, "_NET_WM_WINDOW_TYPE_DIALOG", False);
     winNormalAtom = XInternAtom (dpy, "_NET_WM_WINDOW_TYPE_NORMAL", False);
-    winTootipAtom = XInternAtom(dpy,  "_NET_WM_WINDOW_TYPE_TOOLTIP", False);
+    winTooltipAtom = XInternAtom(dpy,  "_NET_WM_WINDOW_TYPE_TOOLTIP", False);
     winComboAtom = XInternAtom(dpy,  "_NET_WM_WINDOW_TYPE_COMBO", False);
     winNotificationAtom = XInternAtom(dpy,  "_NET_WM_WINDOW_TYPE_NOTIFICATION", False);
 
@@ -1797,9 +1796,10 @@ main (int argc, char **argv) {
 
     rootPicture = XRenderCreatePicture (dpy, root,
                                                                     XRenderFindVisualFormat (dpy,
-                                                                                                                    DefaultVisual (dpy, scr)),
+																	DefaultVisual (dpy, scr)),
                                                                     CPSubwindowMode,
                                                                     &pa);
+
     blackPicture = solid_picture (dpy, True, 1, 0, 0, 0);
     if (compMode == CompServerShadows)
         transBlackPicture = solid_picture (dpy, True, 0.3, 0, 0, 0);
