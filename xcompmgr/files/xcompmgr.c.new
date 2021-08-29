@@ -137,7 +137,6 @@ static Atom winNormalAtom;
 static Atom winTooltipAtom;
 static Atom winComboAtom;
 static Atom winNotificationAtom;
-static Atom winUtilityAtom;
 
 // opacity property name; sometime soon I'll write up an EWMH spec for it
 #define OPACITY_PROP	"_NET_WM_WINDOW_OPACITY"
@@ -397,11 +396,12 @@ make_shadow (Display *dpy, double opacity, int width, int height) {
 }
 
 static Picture
-shadow_picture (Display *dpy, double opacity, Picture alpha_pict, int width, int height, int *wp, int *hp) {
-    XImage *shadowImage;
-    Pixmap shadowPixmap;
-    Picture shadowPicture;
-    GC gc;
+shadow_picture (Display *dpy, double opacity, Picture alpha_pict,
+                            int width, int height, int *wp, int *hp) {
+                                XImage *shadowImage;
+                                Pixmap shadowPixmap;
+                                Picture shadowPicture;
+                                GC gc;
 
     shadowImage = make_shadow (dpy, opacity, width, height);
     if (!shadowImage)
@@ -456,7 +456,7 @@ solid_picture (Display *dpy, Bool argb, double a, double r, double g, double b) 
     pa.repeat = True;
     picture = XRenderCreatePicture (dpy, pixmap,
                                                         XRenderFindStandardFormat (dpy,
-                                                                                                        argb ? PictStandardARGB32 : PictStandardA8),
+                                                                                                    argb ? PictStandardARGB32 : PictStandardA8),
                                                         CPRepeat,
                                                         &pa);
 
@@ -542,12 +542,12 @@ root_tile (Display *dpy) {
                                                 0, 4, False, AnyPropertyType,
                                                 &actual_type, &actual_format, &nitems,
                                                 &bytes_after, &prop) == Success &&
-                                                    actual_type == XInternAtom (dpy, "PIXMAP", False) &&
-                                                        actual_format == 32 && nitems == 1) {
-                                                            memcpy (&pixmap, prop, 4);
-                                                            XFree (prop);
-                                                            fill = False;
-                                                            break;
+                                                actual_type == XInternAtom (dpy, "PIXMAP", False) &&
+                                                actual_format == 32 && nitems == 1) {
+                                                    memcpy (&pixmap, prop, 4);
+                                                    XFree (prop);
+                                                    fill = False;
+                                                    break;
         }
     }
     if (!pixmap) {
@@ -590,39 +590,43 @@ win_extents (Display *dpy, win *w) {
     r.height = w->a.height + w->a.border_width * 2;
 
     if (1 && w->windowType == winNormalAtom && w->a.override_redirect && 
-        ((*((long int *)w->a.visual) & CopyFromParent) == CopyFromParent)) {
-            draw_shadow = True; // don't ignore: alt+tab, dmenu
+    ((*((long int *)w->a.visual) & CopyFromParent) == CopyFromParent)) {
+        draw_shadow = True; // don't ignore: alt+tab, dmenu
     }
     else
-        if (w->mode == WINDOW_ARGB || w->windowType == winTooltipAtom ||
-		    w->windowType == winNotificationAtom || w->windowType == winUtilityAtom) {
-                draw_shadow = True; // don't ignore: dunst, toolkit windows aso..
+        if (w->mode == WINDOW_ARGB ||
+        w->windowType == winNotificationAtom ||
+        w->windowType == winTooltipAtom ||
+        w->windowType == winUtilAtom) {
+            draw_shadow = True; // don't ignore: dunst, toolkit windows aso..
         }
     else
-        if (w->windowType == winComboAtom || w->windowType == 0) {
-            draw_shadow = False; // ignore: unknown types..
+        if (w->windowType == winTypeAtom ||
+        w->windowType == winComboAtom ||
+        w->windowType == 0) {
+            draw_shadow = False; // ignore: drag text, unknown types..
         }
 
     if (compMode != CompSimple && !(w->windowType == winDockAtom &&
-        excludeDockShadows) && draw_shadow) {
-            XRectangle  sr;
-            if (compMode == CompServerShadows) {
-                w->shadow_dx = 4;
-                w->shadow_dy = 4;
-                w->shadow_width = w->a.width;
-                w->shadow_height = w->a.height;
+    excludeDockShadows) && draw_shadow) {
+        XRectangle  sr;
+        if (compMode == CompServerShadows) {
+            w->shadow_dx = 4;
+            w->shadow_dy = 4;
+            w->shadow_width = w->a.width;
+            w->shadow_height = w->a.height;
+        }
+        else {
+            w->shadow_dx = shadowOffsetX;
+            w->shadow_dy = shadowOffsetY;
+            if (!w->shadow) {
+                double opacity = shadowOpacity;
+                if (w->mode == WINDOW_TRANS)
+                    opacity = opacity * ((double)w->opacity)/((double)OPAQUE);
+                w->shadow = shadow_picture (dpy, opacity, w->alphaPict, r.width, r.height,
+                                                                &w->shadow_width, &w->shadow_height);
             }
-            else {
-                w->shadow_dx = shadowOffsetX;
-                w->shadow_dy = shadowOffsetY;
-                if (!w->shadow) {
-                    double opacity = shadowOpacity;
-                    if (w->mode == WINDOW_TRANS)
-                        opacity = opacity * ((double)w->opacity)/((double)OPAQUE);
-                    w->shadow = shadow_picture (dpy, opacity, w->alphaPict, r.width, r.height,
-                                                                        &w->shadow_width, &w->shadow_height);
-                }
-            }
+        }
 
         sr.x = w->a.x + w->shadow_dx;
         sr.y = w->a.y + w->shadow_dy;
@@ -670,27 +674,31 @@ paint_all (Display *dpy, XserverRegion region) {
         r.height = root_height;
         region = XFixesCreateRegion (dpy, &r, 1);
     }
+
 #if MONITOR_REPAINT
     rootBuffer = rootPicture;
 #else
     if (!rootBuffer) {
       Pixmap rootPixmap = XCreatePixmap (dpy, root, root_width, root_height,
-                                                                    DefaultDepth (dpy, scr));
+                                                                DefaultDepth (dpy, scr));
       rootBuffer = XRenderCreatePicture (dpy, rootPixmap,
-                                                                XRenderFindVisualFormat (dpy,
-                                                                DefaultVisual (dpy, scr)),
-                                                                0, NULL);
+                                                            XRenderFindVisualFormat (dpy,
+                                                            DefaultVisual (dpy, scr)),
+                                                            0, NULL);
       XFreePixmap (dpy, rootPixmap);
     }
 #endif
     XFixesSetPictureClipRegion (dpy, rootPicture, 0, 0, region);
+
 #if MONITOR_REPAINT
     XRenderComposite (dpy, PictOpSrc, blackPicture, None, rootPicture,
-                                        0, 0, 0, 0, 0, 0, root_width, root_height);
+                                    0, 0, 0, 0, 0, 0, root_width, root_height);
 #endif
+
 #if DEBUG_REPAINT
     printf ("paint:");
 #endif
+
     for (w = list; w; w = w->next) {
 #if CAN_DO_USABLE
         if (!w->usable)
@@ -701,7 +709,7 @@ paint_all (Display *dpy, XserverRegion region) {
             continue;
         // if invisible, ignore it
         if (w->a.x + w->a.width < 1 || w->a.y + w->a.height < 1 ||
-            w->a.x >= root_width || w->a.y >= root_height)
+        w->a.x >= root_width || w->a.y >= root_height)
             continue;
         if (!w->picture) {
             XRenderPictureAttributes pa;
@@ -714,15 +722,16 @@ paint_all (Display *dpy, XserverRegion region) {
         if (w->pixmap)
             draw = w->pixmap;
 #endif
+
         format = XRenderFindVisualFormat (dpy, w->a.visual);
         pa.subwindow_mode = IncludeInferiors;
-        w->picture = XRenderCreatePicture (dpy, draw, format,
-                                                                    CPSubwindowMode,
-                                                                    &pa);
+        w->picture = XRenderCreatePicture (dpy, draw, format, CPSubwindowMode, &pa);
     }
+
 #if DEBUG_REPAINT
     printf (" 0x%x", w->id);
 #endif
+
     if (clipChanged) {
         if (w->borderSize) {
             set_ignore (dpy, NextRequest (dpy));
@@ -761,8 +770,7 @@ paint_all (Display *dpy, XserverRegion region) {
             XFixesSubtractRegion (dpy, region, region, w->borderSize);
             set_ignore (dpy, NextRequest (dpy));
             XRenderComposite (dpy, PictOpSrc, w->picture, None, rootBuffer,
-                                                0, 0, 0, 0,
-                                                x, y, wid, hei);
+                                                0, 0, 0, 0, x, y, wid, hei);
         }
         if (!w->borderClip) {
             w->borderClip = XFixesCreateRegion (dpy, NULL, 0);
@@ -772,10 +780,12 @@ paint_all (Display *dpy, XserverRegion region) {
         w->prev_trans = t;
         t = w;
     }
+
 #if DEBUG_REPAINT
     printf ("\n");
     fflush (stdout);
 #endif
+
     XFixesSetPictureClipRegion (dpy, rootBuffer, 0, 0, region);
     paint_root (dpy);
     for (w = t; w; w = w->prev_trans) {
@@ -789,13 +799,11 @@ paint_all (Display *dpy, XserverRegion region) {
                     break;
                 set_ignore (dpy, NextRequest (dpy));
                 if (w->opacity != OPAQUE && !w->shadowPict)
-                    w->shadowPict = solid_picture (dpy, True,
-                                                                        (double) w->opacity / OPAQUE * 0.3,
+                    w->shadowPict = solid_picture (dpy, True, (double) w->opacity / OPAQUE * 0.3,
                                                                         0, 0, 0);
                 XRenderComposite (dpy, PictOpOver,
                                                     w->shadowPict ? w->shadowPict : transBlackPicture,
-                                                    w->picture, rootBuffer,
-                                                    0, 0, 0, 0,
+                                                    w->picture, rootBuffer, 0, 0, 0, 0,
                                                     w->a.x + w->shadow_dx,
                                                     w->a.y + w->shadow_dy,
                                                     w->shadow_width, w->shadow_height);
@@ -804,8 +812,7 @@ paint_all (Display *dpy, XserverRegion region) {
                 // don't bother drawing shadows on desktop windows
                 if (w->shadow && w->windowType != winDesktopAtom) {
                     XRenderComposite (dpy, PictOpOver, blackPicture,
-                                                    w->shadow, rootBuffer,
-                                                    0, 0, 0, 0,
+                                                    w->shadow, rootBuffer, 0, 0, 0, 0,
                                                     w->a.x + w->shadow_dx,
                                                     w->a.y + w->shadow_dy,
                                                     w->shadow_width, w->shadow_height);
@@ -813,8 +820,7 @@ paint_all (Display *dpy, XserverRegion region) {
             break;
         }
         if (w->opacity != OPAQUE && !w->alphaPict)
-            w->alphaPict = solid_picture (dpy, False,
-                                                            (double) w->opacity / OPAQUE, 0, 0, 0);
+            w->alphaPict = solid_picture (dpy, False, (double) w->opacity / OPAQUE, 0, 0, 0);
         if (w->mode == WINDOW_TRANS) {
             int x, y, wid, hei;
             XFixesIntersectRegion(dpy, w->borderClip, w->borderClip, w->borderSize);
@@ -832,8 +838,7 @@ paint_all (Display *dpy, XserverRegion region) {
 #endif
             set_ignore (dpy, NextRequest (dpy));
             XRenderComposite (dpy, PictOpOver, w->picture, w->alphaPict, rootBuffer,
-                                                0, 0, 0, 0,
-                                                x, y, wid, hei);
+                                                0, 0, 0, 0, x, y, wid, hei);
         }
         else if (w->mode == WINDOW_ARGB) {
             int x, y, wid, hei;
@@ -852,8 +857,7 @@ paint_all (Display *dpy, XserverRegion region) {
 #endif
             set_ignore (dpy, NextRequest (dpy));
             XRenderComposite (dpy, PictOpOver, w->picture, w->alphaPict, rootBuffer,
-                                                0, 0, 0, 0,
-                                                x, y, wid, hei);
+                                                0, 0, 0, 0, x, y, wid, hei);
         }
         XFixesDestroyRegion (dpy, w->borderClip);
         w->borderClip = None;
@@ -1000,8 +1004,9 @@ get_opacity_prop(Display *dpy, win *w, unsigned int def) {
 
     unsigned char *data;
     int result = XGetWindowProperty(dpy, w->id, opacityAtom, 0L, 1L, False,
-                                                            XA_CARDINAL, &actual, &format,
-                                                            &n, &left, &data);
+                                                        XA_CARDINAL, &actual, &format,
+                                                        &n, &left, &data);
+
     if (result == Success && data != NULL) {
         unsigned int i;
         memcpy (&i, data, sizeof (unsigned int));
@@ -1021,8 +1026,8 @@ get_wintype_prop(Display * dpy, Window w) {
 
     unsigned char *data;
     int result = XGetWindowProperty (dpy, w, winTypeAtom, 0L, 1L, False,
-                                                            XA_ATOM, &actual, &format,
-                                                            &n, &left, &data);
+                                                        XA_ATOM, &actual, &format,
+                                                        &n, &left, &data);
 
     if (result == Success && data != (unsigned char *)None) {
         Atom a;
@@ -1788,8 +1793,7 @@ main (int argc, char **argv) {
     winNormalAtom = XInternAtom (dpy, "_NET_WM_WINDOW_TYPE_NORMAL", False);
     winTooltipAtom = XInternAtom(dpy, "_NET_WM_WINDOW_TYPE_TOOLTIP", False);
     winComboAtom = XInternAtom(dpy, "_NET_WM_WINDOW_TYPE_COMBO", False);
-    winNotificationAtom = XInternAtom(dpy,  "_NET_WM_WINDOW_TYPE_NOTIFICATION", False);
-	winUtilityAtom = XInternAtom(dpy, "_NET_WM_WINDOW_TYPE_UTILITY", False);
+    winNotificationAtom = XInternAtom(dpy, "_NET_WM_WINDOW_TYPE_NOTIFICATION", False);
 
     pa.subwindow_mode = IncludeInferiors;
 
