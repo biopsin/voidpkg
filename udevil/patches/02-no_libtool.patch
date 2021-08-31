@@ -1,0 +1,21 @@
+From 1637ff8ff4be6ccc1c678a8ed482b3de39c1f99f Mon Sep 17 00:00:00 2001
+From: orbea <orbea@riseup.net>
+Date: Thu, 14 Jan 2021 08:03:17 -0800
+Subject: [PATCH] build: Don't use libtool.
+
+---
+ configure.ac | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index f2de369..64a9152 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -11,7 +11,6 @@ AM_MAINTAINER_MODE
+ AC_ISC_POSIX
+ AM_PROG_CC_C_O
+ AC_HEADER_STDC
+-AM_PROG_LIBTOOL
+ AC_PROG_INSTALL
+ 
+ AC_DEFINE_UNQUOTED(UDEVIL_VERSION, "$VERSION", [udevil version])

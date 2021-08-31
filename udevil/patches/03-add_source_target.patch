@@ -1,0 +1,86 @@
+From 6539532b4da3eb6339efe5a21e01b1103d3dfa05 Mon Sep 17 00:00:00 2001
+From: ebonmts <mats.bengtsson@ericsson.com>
+Date: Thu, 30 Jan 2020 10:30:09 +0100
+Subject: [PATCH] Add --source and --target command-line options
+
+---
+ src/udevil.c | 31 +++++++++++++++++++++++++------
+ 1 file changed, 25 insertions(+), 6 deletions(-)
+
+diff --git a/src/udevil.c b/src/udevil.c
+index 9d95d88..464a026 100644
+--- a/src/udevil.c
++++ b/src/udevil.c
+@@ -5175,7 +5175,8 @@ printf("\n-----------------------\n");
+                     }
+                 }
+                 else if ( !strcmp( arg, "unmount" ) || !strcmp( arg, "--unmount" )
+-                           || !strcmp( arg, "umount" ) || !strcmp( arg, "--umount" ) )
++                                                    || !strcmp( arg, "umount" )
++                                                    || !strcmp( arg, "--umount" ) )
+                 {
+                     data->cmd_type = CMD_UNMOUNT;
+                     if ( arg_next )
+@@ -5203,7 +5204,7 @@ printf("\n-----------------------\n");
+                     }
+                 }
+                 else if ( !strcmp( arg, "info" ) || !strcmp( arg, "--show-info" )
+-                                                    || !strcmp( arg, "--info" ) )
++                                                 || !strcmp( arg, "--info" ) )
+                 {
+                     data->cmd_type = CMD_INFO;
+                     if ( arg_next )
+@@ -5229,7 +5230,7 @@ printf("\n-----------------------\n");
+                 else if ( !strcmp( arg, "--quiet" ) )
+                     verbose = 2;
+                 else if ( !strcmp( arg, "help" ) || !strcmp( arg, "--help" )
+-                                                    || !strcmp( arg, "-h" ) )
++                                                 || !strcmp( arg, "-h" ) )
+                 {
+                     dump_log();
+                     drop_privileges( 1 );
+@@ -5250,8 +5251,8 @@ printf("\n-----------------------\n");
+                     ac += next_inc;
+                 }
+                 else if ( !strcmp( arg, "-t" ) || !strcmp( arg, "--filesystem-type" )
+-                                                || !strcmp( arg, "--types" )
+-                                                || !strcmp( arg, "--mount-fstype" ) )
++                                               || !strcmp( arg, "--types" )
++                                               || !strcmp( arg, "--mount-fstype" ) )
+                 {
+                     if ( !arg_next )
+                         goto _reject_missing_arg;
+@@ -5261,7 +5262,7 @@ printf("\n-----------------------\n");
+                     ac += next_inc;
+                 }
+                 else if ( !strcmp( arg, "-o" ) || !strcmp( arg, "--options" )
+-                                        || !strcmp( arg, "--mount-options" ) )
++                                               || !strcmp( arg, "--mount-options" ) )
+                 {
+                     if ( !arg_next )
+                         goto _reject_missing_arg;
+@@ -5288,6 +5289,24 @@ printf("\n-----------------------\n");
+                     data->uuid = g_strdup( arg_next );
+                     ac += next_inc;
+                 }
++                else if ( !strcmp( arg, "--source" ) )
++                {
++                    if ( !arg_next )
++                        goto _reject_missing_arg;
++                    if ( data->device_file )
++                        goto _reject_too_many;
++                    data->device_file = g_strdup( arg_next );
++                    ac += next_inc;
++                }
++                else if ( !strcmp( arg, "--target" ) )
++                {
++                    if ( !arg_next )
++                        goto _reject_missing_arg;
++                    if ( data->point )
++                        goto _reject_too_many;
++                    data->point = g_strdup( arg_next );
++                    ac += next_inc;
++                }
+                 else if ( !strcmp( arg, "--no-user-interaction" ) )
+                 {
+                     // ignore
