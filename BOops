@@ -1,0 +1,14 @@
+# Template file for 'BOops'
+pkgname=BOops
+version=1.8.0
+revision=1
+build_style=gnu-makefile
+make_build_args="all"
+hostmakedepends="pkg-config"
+makedepends="libX11-devel libsndfile-devel cairo-devel lv2"
+short_desc="Glitch effect sequencer LV2 plugin"
+maintainer="biopsin <biopsin@teknik.io>"
+license="GPL-3.0-or-later"
+homepage="https://github.com/sjaehn/BOops"
+distfiles="${homepage}/archive/refs/tags/${version}.tar.gz"
+checksum=6e0acb9aead02ec67da854db3f4fbc0c15296c360c48ef8506f55b525b23f0c4
