@@ -1,7 +1,7 @@
 # Template file for 'libSwell'
 pkgname=libSwell
 version=210910
-revision=2
+revision=1
 #_commit="6f805de7afbfd94ccb465187d7108bb359148b30"
 #wrksrc="WDL-${_commit}"
 make_build_args="GDK2=1"
