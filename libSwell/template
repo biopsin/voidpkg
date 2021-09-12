@@ -11,8 +11,7 @@ short_desc="Set of simple C++ classes"
 maintainer="biopsin <biopsin@protonmail.com>"
 license="GPL-2-or-later"
 homepage="https://github.com/justinfrankel/WDL"
-#distfiles="${homepage}/archive/${_commit}.zip"
-distfiles="https://github.com/gurrgur/WDL/archive/refs/heads/linux-ux-improvements.zip"
+distfiles="${homepage}/archive/${_commit}.zip"
 checksum=5119645173ad1b1b7100f37a536fc3d80a5e6071b1d2c0c4e2b67cf9161ea3e3
 
 do_build() {
