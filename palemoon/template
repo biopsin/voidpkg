@@ -1,12 +1,9 @@
 # Template file for 'Pale Moon'
 pkgname=palemoon
-version=29.4.0
+version=29.4.1
 revision=1
-
-_uxpver=20210817
-
-wrksrc="pale-moon"
-hostmakedepends="curl autoconf213 unzip zip pkg-config perl python yasm tar which"
+create_wrksrc=yes
+hostmakedepends="autoconf213 unzip zip pkg-config perl python yasm tar which"
 makedepends="python-devel libatomic-devel gtk+-devel libXt-devel alsa-lib-devel
  libvpx-devel ffmpeg-devel libpng-devel"
 depends="desktop-file-utils hicolor-icon-theme mime-types"
@@ -14,17 +11,10 @@ short_desc="UXP-based web browser"
 maintainer="biopsin <biopsin@yahoo.no>"
 license="MPL-2.0, GPL-2.0-or-later, LGPL-2.1-or-later"
 homepage="https://www.palemoon.org"
-distfiles="https://repo.palemoon.org/MoonchildProductions/Pale-Moon/archive/${version}_Release.tar.gz"
-checksum=949a3aa8d857be1078aa27a73b134026f11c3e60ef1e790ff507dbec5d952164
+distfiles="http://archive.palemoon.org/source/${pkgname}-${version}-source.tar.xz"
+checksum=9a83e7c86d6143811ae70a37d25ea69c9ea289abed2b97ff11e0217f91858700
 python_version=2
 lib32disabled=yes
-
-post_extract() {
-	[ ! -f "${XBPS_SRCDISTDIR}/${pkgname}-${version}/${_uxpver}.tar.gz" ] && \
-		curl -o ${XBPS_SRCDISTDIR}/${pkgname}-${version}/${_uxpver}.tar.gz \
-		https://repo.palemoon.org/MoonchildProductions/UXP/archive/RELBASE_${_uxpver}.tar.gz
-	tar --strip-components=1 -xvzf ${XBPS_SRCDISTDIR}/${pkgname}-${version}/${_uxpver}.tar.gz -C platform
-}
 
 do_patch() {
 	cp "${FILESDIR}/mozconfig" "${wrksrc}/.mozconfig"
