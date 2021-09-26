@@ -1,0 +1,23 @@
+# Template file for 'xlocatemouse'
+pkgname=xlocatemouse
+version=20.05
+revision=1
+build_style="gnu-makefile"
+hostmakedepends="git pkg-config"
+makedepends="libX11-devel"
+short_desc="Locate mouse pointer"
+maintainer="biopsin <biopsin@gmail.com>"
+license="MIT"
+homepage="https://www.uninformativ.de/git/xlocatemouse/file/README.html"
+checksum=4c9cd7eb89e929546466f6e5088ba5364047ad8ce5e4ada02b1d094296763234
+
+do_fetch() {
+	git clone https://www.uninformativ.de/git/xlocatemouse.git $wrksrc
+	cd $wrksrc
+	
+	vsed -i 's|/usr/local|/usr|' Makefile
+}
+
+post_install() {
+  vlicense LICENSE
+}
