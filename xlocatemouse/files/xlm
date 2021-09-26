@@ -1,0 +1,3 @@
+#!/usr/bin/sh
+# Check prelim xlocatemouse
+pidof -s xlocatemouse  > /dev/null && exit || /usr/bin/xlocatemouse  > /dev/null
