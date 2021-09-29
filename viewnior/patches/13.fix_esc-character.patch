@@ -1,0 +1,24 @@
+From b2dd31c83eea049d3f8ced6b59c030ada3df1c71 Mon Sep 17 00:00:00 2001
+From: phosit <phosit@autistici.org>
+Date: Wed, 29 Sep 2021 10:05:13 +0200
+Subject: [PATCH] Better fix for filenames with escape-character
+
+---
+ src/vnr-window.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/vnr-window.c b/src/vnr-window.c
+index 9e14d63..d7354c4 100755
+--- a/src/vnr-window.c
++++ b/src/vnr-window.c
+@@ -1674,8 +1674,8 @@ vnr_window_cmd_delete(GtkAction *action, VnrWindow *window)
+         prompt = g_strdup_printf (_("Are you sure you want to\n"
+                                     "permanently delete \"%s\"?"),
+                                   VNR_FILE(window->file_list->data)->display_name);
+-        markup = g_strdup_printf ("<span weight=\"bold\" size=\"larger\">%s</span>\n\n%s",
+-                                  prompt, warning);
++        markup = g_markup_printf_escaped ("<span weight=\"bold\" size=\"larger\">%s</span>\n\n%s",
++                                          prompt, warning);
+ 
+ 
+         dlg = gtk_message_dialog_new(GTK_WINDOW(window),
