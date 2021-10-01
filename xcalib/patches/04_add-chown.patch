@@ -1,0 +1,24 @@
+From f36c08687076f232ef349f35273302a724f73d5e Mon Sep 17 00:00:00 2001
+From: CSylvain <chrissylvain+gh@gmail.com>
+Date: Fri, 1 Mar 2019 12:30:31 -0500
+Subject: [PATCH] removed extra 'cp' parameters; added chown
+
+remove possibly non-portable 'cp' parameters and added chown to normalize binary ownership after installation
+---
+ Makefile | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 16c749e..490152d 100644
+--- a/Makefile
++++ b/Makefile
+@@ -62,7 +62,8 @@ win_xcalib: xcalib.c
+ 	$(CC) $(CFLAGS) -mwindows -lm resource.o -o xcalib xcalib.o
+ 
+ install:
+-	cp -pv ./xcalib $(DESTDIR)/usr/local/bin/
++	cp ./xcalib $(DESTDIR)/usr/local/bin/
++	chown root:root $(DESTDIR)/usr/local/bin/xcalib
+ #	chmod 0755 $(DESTDIR)/usr/local/bin/xcalib
+ 
+ clean:
