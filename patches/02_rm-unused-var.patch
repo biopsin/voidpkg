@@ -1,0 +1,22 @@
+From 11b383d2c79019111b672740b160d2097b34842e Mon Sep 17 00:00:00 2001
+From: John Lindgren <john@jlindgren.net>
+Date: Wed, 30 Dec 2020 15:13:17 -0500
+Subject: [PATCH] Remove unused variables
+
+---
+ xcalib.c | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/xcalib.c b/xcalib.c
+index 99cca17..88bca13 100644
+--- a/xcalib.c
++++ b/xcalib.c
+@@ -570,8 +570,6 @@ int
+ main (int argc, char *argv[])
+ {
+   char in_name[256] = { '\000' };
+-  char tag_name[40] = { '\000' };
+-  int found;
+   u_int16_t *r_ramp = NULL, *g_ramp = NULL, *b_ramp = NULL;
+   int i;
+   int clear = 0;

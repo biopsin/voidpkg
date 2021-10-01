@@ -1,0 +1,35 @@
+From e17eef30eb5fedce0815c460579c32cbc4cab2e7 Mon Sep 17 00:00:00 2001
+From: John Lindgren <john@jlindgren.net>
+Date: Wed, 30 Dec 2020 15:11:53 -0500
+Subject: [PATCH] Fix misleading indentation
+
+---
+ xcalib.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/xcalib.c b/xcalib.c
+index 2386d7c..99cca17 100644
+--- a/xcalib.c
++++ b/xcalib.c
+@@ -651,8 +651,8 @@ main (int argc, char *argv[])
+     if (!strcmp (argv[i], "-d") || !strcmp (argv[i], "-display")) {
+       if (++i >= argc)
+         usage ();
+-        displayname = argv[i];
+-        continue;
++      displayname = argv[i];
++      continue;
+     }
+ #endif
+     /* X11 screen / Win32 monitor index */
+@@ -667,8 +667,8 @@ main (int argc, char *argv[])
+     if (!strcmp (argv[i], "-o") || !strcmp (argv[i], "-output")) {
+       if (++i >= argc)
+         usage ();
+-        xoutput = atoi (argv[i]);
+-        continue;
++      xoutput = atoi (argv[i]);
++      continue;
+     }
+ #endif
+ #ifdef FGLRX
