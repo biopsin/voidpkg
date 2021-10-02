@@ -1,0 +1,16 @@
+diff --git a/CPP/7zip/Archive/Zip/ZipItem.cpp b/CPP/7zip/Archive/Zip/ZipItem.cpp
+index 353e895..4d48296 100644
+--- a/CPP/7zip/Archive/Zip/ZipItem.cpp
++++ b/CPP/7zip/Archive/Zip/ZipItem.cpp
+@@ -423,10 +423,10 @@ void CItem::GetUnicodeString(UString &res, const AString &s, bool isComment, boo
+       const char* src = s.Ptr();
+       size_t slen = s.Len();
+       size_t dlen = slen * 4;
+-      const char* dest = s_utf8.GetBuf_SetEnd(dlen + 1); // (source length * 4) + null termination
++      const char* dest = s_utf8.GetBuf_SetEnd(dlen); // (source length * 4)
+ 
+       size_t done = iconv(cd, (char**)&src, &slen, (char**)&dest, &dlen);
+-      bzero((size_t*)dest + done, 1);
++      s_utf8.ReleaseBuf_SetEnd(s_utf8.Len() - dlen);
+ 
+       iconv_close(cd);
