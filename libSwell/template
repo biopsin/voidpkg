@@ -1,8 +1,8 @@
 # Template file for 'libSwell'
 pkgname=libSwell
-version=211030
+version=211107
 revision=1
-_commit="2dc95c69b01df01c5be9591a52a03d71af2fc9f0"
+_commit="1dd3b7a0fbf46558827c5bb2183eefc2e882a8c9"
 wrksrc="WDL-${_commit}"
 make_build_args="GDK2=1"
 hostmakedepends="pkg-config"
@@ -12,7 +12,7 @@ maintainer="biopsin <biopsin@protonmail.com>"
 license="GPL-2-or-later"
 homepage="https://github.com/justinfrankel/WDL"
 distfiles="${homepage}/archive/${_commit}.zip"
-checksum=5bcb615ac35bf3b87a17f0e4c5b8857ffa831a13182ed99ea90e008fbd57fb69
+checksum=2d377fe276c9b02bf0af25614cfa5bdd0e52db11d3e6a6a0119fd44ec0a9a828
 
 do_build() {
     cd ${wrksrc}/WDL/swell
