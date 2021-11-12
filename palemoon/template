@@ -45,11 +45,12 @@ do_install() {
 	DESTDIR="$DESTDIR" ./mach install
 
 	for i in 16x16 32x32 48x48; do
-		vinstall ${wrksrc}/palemoon/branding/unstable/default${i%x*}.png 644 \
+		vinstall ${wrksrc}/palemoon/branding/unofficial/default${i%x*}.png 644 \
 			usr/share/icons/hicolor/${i}/apps palemoon.png
 	done
 
-	vinstall ${wrksrc}/palemoon/branding/official/palemoon.desktop 644 usr/share/applications
+	vinstall ${wrksrc}/palemoon/branding/unofficial/browser.desktop 644 \
+		usr/share/applications palemoon.desktop
 
 	# https://bugzilla.mozilla.org/show_bug.cgi?id=658850
 	ln -sf palemoon ${DESTDIR}/usr/lib/palemoon/palemoon-bin
