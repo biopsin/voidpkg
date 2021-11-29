@@ -1,0 +1,68 @@
+From f9a46f29ea373fbf61edae6ff0126a9aa77be5e7 Mon Sep 17 00:00:00 2001
+From: qarkai <qarkai@gmail.com>
+Date: Wed, 24 Nov 2021 17:13:49 +0300
+Subject: [PATCH] Move duplicated code to vnr_window_resize() function
+
+---
+ src/vnr-window.c | 30 ++++++++++++++----------------
+ 1 file changed, 14 insertions(+), 16 deletions(-)
+
+diff --git a/src/vnr-window.c b/src/vnr-window.c
+index 0e7bf56..237e70c 100755
+--- a/src/vnr-window.c
++++ b/src/vnr-window.c
+@@ -1275,6 +1275,17 @@ vnr_window_cmd_prev (GtkAction *action, gpointer user_data)
+     vnr_window_prev(VNR_WINDOW(user_data));
+ }
+ 
++static void
++vnr_window_resize (VnrWindow *window)
++{
++    gint img_w = window->current_image_width;          /* Width of the pixbuf */
++    gint img_h = window->current_image_height;         /* Height of the pixbuf */
++
++    vnr_tools_fit_to_size (&img_w, &img_h, window->max_width, window->max_height);
++
++    gtk_window_resize (GTK_WINDOW (window), img_w, img_h + get_top_widgets_height(window));
++}
++
+ static void
+ vnr_window_cmd_resize (GtkToggleAction *action, VnrWindow *window)
+ {
+@@ -1283,18 +1294,12 @@ vnr_window_cmd_resize (GtkToggleAction *action, VnrWindow *window)
+         return;
+     }
+ 
+-    gint img_h, img_w;          /* Width and Height of the pixbuf */
+-
+-    img_w = window->current_image_width;
+-    img_h = window->current_image_height;
+-
+-    if ( img_w == 0 || img_h == 0 )
++    if ( window->current_image_width == 0 || window->current_image_height == 0 )
+         return;
+ 
+     window->prefs->auto_resize = TRUE;
+ 
+-    vnr_tools_fit_to_size (&img_w, &img_h, window->max_width, window->max_height);
+-    gtk_window_resize (GTK_WINDOW (window), img_w, img_h + get_top_widgets_height(window));
++    vnr_window_resize (window);
+ }
+ 
+ static void
+@@ -2500,14 +2505,7 @@ vnr_window_open (VnrWindow * window, gboolean fit_to_screen)
+ 
+     if(fit_to_screen)
+     {
+-        gint img_h, img_w;          /* Width and Height of the pixbuf */
+-
+-        img_w = window->current_image_width;
+-        img_h = window->current_image_height;
+-
+-        vnr_tools_fit_to_size (&img_w, &img_h, window->max_width, window->max_height);
+-
+-        gtk_window_resize (GTK_WINDOW (window), img_w, img_h + get_top_widgets_height(window));
++        vnr_window_resize (window);
+     }
+ 
+     last_fit_mode = UNI_IMAGE_VIEW(window->view)->fitting;
