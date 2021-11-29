@@ -1,0 +1,21 @@
+From 0b53f3124246117a82246e498668edc152da084b Mon Sep 17 00:00:00 2001
+From: Tihon <tihon111xxx@gmail.com>
+Date: Sun, 1 Nov 2020 15:40:38 +0300
+Subject: [PATCH] After resizing the window, places it in the center
+
+---
+ src/vnr-window.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/vnr-window.c b/src/vnr-window.c
+index 435b45d..c2f85b8 100755
+--- a/src/vnr-window.c
++++ b/src/vnr-window.c
+@@ -1252,6 +1252,7 @@
+ 
+     vnr_tools_fit_to_size (&img_w, &img_h, window->max_width, window->max_height);
+ 
++	gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER_ALWAYS);
+     gtk_window_resize (GTK_WINDOW (window), img_w, img_h + get_top_widgets_height(window));
+ }
+ 
