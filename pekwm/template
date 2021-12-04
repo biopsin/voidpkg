@@ -1,6 +1,6 @@
 # Template file for 'pekwm'
 pkgname=pekwm
-version=0.2.0
+version=0.2.1
 revision=1
 wrksrc="${pkgname}-release-${version}"
 build_style=cmake
@@ -15,7 +15,7 @@ maintainer="Orphaned <orphan@voidlinux.org>"
 license="GPL-2.0-or-later"
 homepage="https://www.pekwm.se/"
 distfiles="https://github.com/pekdon/pekwm/archive/refs/tags/release-${version}.tar.gz"
-checksum=143df0021665a7a1e06c22540f45ca3392235cb3dd2e0be70f9e00fd988fc9f9
+checksum=62e858015e1a5a54bbddab202a1fb455c821bda62498e9cadfa1d00a5a2575c3
 conf_files="/etc/pekwm/*"
 
 post_install() {
