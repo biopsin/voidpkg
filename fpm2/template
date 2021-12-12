@@ -13,3 +13,9 @@ license="GPL License"
 homepage="http://fpm.sourceforge.net/"
 distfiles="https://als.regnet.cz/fpm2/download/${pkgname}-${version}dev1.tar.bz2"
 checksum=33d9313aea0a16e901d21bac684591a6df3aff9880aa5b7141dbff5637da79b0
+CFLAGS="-fcommon"
+
+post_install() {
+	cp -f "${FILESDIR}/logo.png" "${DESTDIR}/usr/share/pixmaps/fpm2"
+	cp -f "${FILESDIR}/fpm2.desktop" "${DESTDIR}/usr/share/applications"
+}
