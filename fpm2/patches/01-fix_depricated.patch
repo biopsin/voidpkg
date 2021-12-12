@@ -1,0 +1,65 @@
+--- a/src/interface.c	2012-04-13 09:40:43.000000000 +0200
++++ b/src/interface.c	2020-11-16 07:00:58.318260315 +0100
+@@ -130,7 +130,7 @@
+   if (app_safe_icon_pixbuf)
+     {
+       gtk_window_set_icon (GTK_WINDOW (app_safe), app_safe_icon_pixbuf);
+-      gdk_pixbuf_unref (app_safe_icon_pixbuf);
++      g_object_unref (app_safe_icon_pixbuf);
+     }
+ 
+   vbox1 = gtk_vbox_new (FALSE, 0);
+@@ -824,7 +824,7 @@
+   if (dialog_edit_passitem_icon_pixbuf)
+     {
+       gtk_window_set_icon (GTK_WINDOW (dialog_edit_passitem), dialog_edit_passitem_icon_pixbuf);
+-      gdk_pixbuf_unref (dialog_edit_passitem_icon_pixbuf);
++      g_object_unref (dialog_edit_passitem_icon_pixbuf);
+     }
+   gtk_window_set_type_hint (GTK_WINDOW (dialog_edit_passitem), GDK_WINDOW_TYPE_HINT_DIALOG);
+ 
+@@ -1078,7 +1078,7 @@
+   if (dialog_password_icon_pixbuf)
+     {
+       gtk_window_set_icon (GTK_WINDOW (dialog_password), dialog_password_icon_pixbuf);
+-      gdk_pixbuf_unref (dialog_password_icon_pixbuf);
++      g_object_unref (dialog_password_icon_pixbuf);
+     }
+   gtk_window_set_type_hint (GTK_WINDOW (dialog_password), GDK_WINDOW_TYPE_HINT_DIALOG);
+ 
+@@ -1287,7 +1287,7 @@
+   if (dialog_password_gen_icon_pixbuf)
+     {
+       gtk_window_set_icon (GTK_WINDOW (dialog_password_gen), dialog_password_gen_icon_pixbuf);
+-      gdk_pixbuf_unref (dialog_password_gen_icon_pixbuf);
++      g_object_unref (dialog_password_gen_icon_pixbuf);
+     }
+   gtk_window_set_type_hint (GTK_WINDOW (dialog_password_gen), GDK_WINDOW_TYPE_HINT_DIALOG);
+ 
+@@ -1533,7 +1533,7 @@
+   if (dialog_cpw_icon_pixbuf)
+     {
+       gtk_window_set_icon (GTK_WINDOW (dialog_cpw), dialog_cpw_icon_pixbuf);
+-      gdk_pixbuf_unref (dialog_cpw_icon_pixbuf);
++      g_object_unref (dialog_cpw_icon_pixbuf);
+     }
+   gtk_window_set_type_hint (GTK_WINDOW (dialog_cpw), GDK_WINDOW_TYPE_HINT_DIALOG);
+ 
+@@ -1790,7 +1790,7 @@
+   if (dialog_launcher_icon_pixbuf)
+     {
+       gtk_window_set_icon (GTK_WINDOW (dialog_launcher), dialog_launcher_icon_pixbuf);
+-      gdk_pixbuf_unref (dialog_launcher_icon_pixbuf);
++      g_object_unref (dialog_launcher_icon_pixbuf);
+     }
+   gtk_window_set_type_hint (GTK_WINDOW (dialog_launcher), GDK_WINDOW_TYPE_HINT_DIALOG);
+ 
+@@ -2175,7 +2175,7 @@
+   if (dialog_preferences_icon_pixbuf)
+     {
+       gtk_window_set_icon (GTK_WINDOW (dialog_preferences), dialog_preferences_icon_pixbuf);
+-      gdk_pixbuf_unref (dialog_preferences_icon_pixbuf);
++      g_object_unref (dialog_preferences_icon_pixbuf);
+     }
+   gtk_window_set_type_hint (GTK_WINDOW (dialog_preferences), GDK_WINDOW_TYPE_HINT_DIALOG);
+ 

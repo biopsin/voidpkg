@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Password Manager
+GenericName=Password Manager
+Comment=Manage passwords
+Exec=timeout 60 fpm2
+TryExec=fpm2
+Terminal=false
+StartupNotify=true
+Type=Application
+Icon=fpm2
+Categories=GTK;Utility;
