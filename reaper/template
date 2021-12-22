@@ -1,6 +1,6 @@
 # Template file for 'reaper'
 pkgname=reaper
-version=6.42
+version=6.43
 revision=1
 archs="i686 x86_64 aarch64 armv7l"
 wrksrc="reaper_linux_${XBPS_TARGET_MACHINE}"
