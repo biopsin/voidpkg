@@ -1,0 +1,30 @@
+From c5601eee81c3a6a6b992e1d0b65b5cc02d375db9 Mon Sep 17 00:00:00 2001
+From: luigifab <31816829+luigifab@users.noreply.github.com>
+Date: Sun, 9 Jan 2022 21:46:45 +0100
+Subject: [PATCH] Add first and last class to treeview cells (#55)
+			and fix the first and last CSS class for RTL treeviews (#57)
+
+---
+diff --git a/treeview__alternating_row_colours.patch b/treeview__alternating_row_colours.patch
+index 6d5d37b..37deaf6 100644
+--- a/gtk/gtktreeview.c
++++ b/gtk/gtktreeview.c
+@@ -5303,6 +5303,18 @@
+ 
+           gtk_style_context_add_class (context, GTK_STYLE_CLASS_CELL);
+ 
++    if (list == first_column)
++      gtk_style_context_add_class (context, rtl ? "last" : "first");
++    if (list == last_column)
++      gtk_style_context_add_class (context, rtl ? "first" : "last"); 
++    if (_gtk_rbtree_node_get_index (tree, node) % 2 == 0)
++      gtk_style_context_add_class (context, "odd");
++    else
++      gtk_style_context_add_class (context, "even");
++
++    if (flags & GTK_CELL_RENDERER_SORTED)
++      gtk_style_context_add_class (context, "sorted");
++
+ 	  if (node == tree_view->priv->cursor_node && has_can_focus_cell
+               && ((column == tree_view->priv->focus_column
+                    && tree_view->priv->draw_keyfocus &&
