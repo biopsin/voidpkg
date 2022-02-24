@@ -1,0 +1,21 @@
+# Fix playhead lockup
+--- a/src/driver_alsa.c	2018-04-09 16:31:37.000000000 +0200
++++ b/src/driver_alsa.c	2018-04-09 16:33:54.232275034 +0200
+@@ -169,12 +169,17 @@
+   int err;
+   snd_pcm_t * pcm_handle = (snd_pcm_t *)handle->custom_data;
+   snd_pcm_hw_params_t * hwparams;
++  int dir;
+   unsigned int rate = format->rate;
+   unsigned int channels = format->channels;
+   unsigned int periods;
+   snd_pcm_uframes_t period_size = PBUF_SIZE/format->channels;
+ 
+-  if (handle->driver_flags != O_RDONLY && handle->driver_flags == O_WRONLY) {
++  if (handle->driver_flags == O_RDONLY) {
++    dir = (int)SND_PCM_STREAM_CAPTURE;
++  } else if (handle->driver_flags == O_WRONLY) {
++    dir = (int)SND_PCM_STREAM_PLAYBACK;
++  } else {
+     return;
+   }

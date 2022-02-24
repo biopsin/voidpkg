@@ -1,0 +1,56 @@
+From 21a1e735ca3d1291fa018805e424c6b0e37bd34e Mon Sep 17 00:00:00 2001
+From: Casey Tucker <dctucker@hotmail.com>
+Date: Fri, 18 Feb 2022 12:48:29 -0800
+Subject: [PATCH] resolve SIGSEGV in sample_show_info_dialog()
+
+list_item was underinitialized, resulting in null-pointer
+dereferencing by g_strdup when calling gtk_clist_append
+
+fixes #7
+
+Related: https://github.com/kfish/sweep/issues/7
+---
+ src/sweep_sample.c | 17 +----------------
+ 1 file changed, 1 insertion(+), 16 deletions(-)
+
+diff --git a/src/sweep_sample.c b/src/sweep_sample.c
+index 2b6dbca..e4ab420 100644
+--- a/src/sweep_sample.c
++++ b/src/sweep_sample.c
+@@ -1805,21 +1805,13 @@ sample_info_dialog_ok_cb (GtkWidget * widget, gpointer data)
+   gtk_widget_hide (dialog);
+ }
+ 
+-/*
+-static gchar * filename_info[] = { N_("Filename:"), "" };
+-static gchar * rate_info[] = { N_("Sampling rate:"), "" };
+-static gchar * channels_info[] = { N_("Channels:"), "" };
+-static gchar * size_info[] = { N_("Data memory:"), "" };
+-static gchar * duration_info[] = { N_("Duration:"), "" };
+-*/
+-
+ void
+ sample_show_info_dialog (sw_sample * sample)
+ {
+   GtkWidget * dialog;
+   GtkWidget * clist;
+   GtkWidget * ok_button;
+-  gchar * list_item[] = { "" };
++  gchar * list_item[] = { N_(""), "" };
+   gint i=0;
+ 
+   if (sample->info_clist == NULL) {
+@@ -1840,13 +1832,6 @@ sample_show_info_dialog (sw_sample * sample)
+ 					GTK_JUSTIFY_LEFT);
+     gtk_box_pack_start (GTK_BOX(GTK_DIALOG(dialog)->vbox), clist,
+ 			FALSE, FALSE, 0);
+-    /*
+-    gtk_clist_append (GTK_CLIST(clist), filename_info);
+-    gtk_clist_append (GTK_CLIST(clist), rate_info);
+-    gtk_clist_append (GTK_CLIST(clist), channels_info);
+-    gtk_clist_append (GTK_CLIST(clist), size_info);
+-    gtk_clist_append (GTK_CLIST(clist), duration_info);
+-    */
+ 
+     gtk_clist_append (GTK_CLIST(clist), list_item);
+     gtk_clist_set_text (GTK_CLIST(clist), i++, 0, _("Filename: "));
