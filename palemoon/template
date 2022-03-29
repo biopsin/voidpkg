@@ -1,6 +1,6 @@
 # Template file for 'Pale Moon'
 pkgname=palemoon
-version=29.4.4
+version=29.4.5
 revision=2
 wrksrc="palemoon-source"
 hostmakedepends="autoconf213 unzip zip pkg-config perl python yasm tar which"
@@ -12,7 +12,7 @@ maintainer="biopsin <biopsin@yahoo.no>"
 license="MPL-2.0, GPL-2.0-or-later, LGPL-2.1-or-later"
 homepage="https://www.palemoon.org"
 distfiles="http://archive.palemoon.org/source/${pkgname}-${version}-source.tar.xz"
-checksum=5d81f24fdc7cdb000d6ed5762459eda842b0b1f43fdad3a4be5e8edd5c8f7079
+checksum=8dd126dc9a002eb2f863f2197e2f36c14928e00a58e0989baf7d6b558c990eb1
 python_version=2
 lib32disabled=yes
 
