@@ -1,9 +1,10 @@
 # Template file for 'Pale Moon'
 pkgname=palemoon
-version=29.4.6
+version=31.0.0
 revision=1
-wrksrc="palemoon-source"
-hostmakedepends="autoconf213 unzip zip pkg-config perl python yasm tar which"
+_uxpver=20220510
+wrksrc="pale-moon"
+hostmakedepends="curl autoconf213 unzip zip pkg-config perl python yasm tar which"
 makedepends="python-devel libatomic-devel gtk+-devel libXt-devel alsa-lib-devel
  libvpx-devel ffmpeg-devel libpng-devel"
 depends="desktop-file-utils hicolor-icon-theme mime-types"
@@ -11,10 +12,17 @@ short_desc="UXP-based web browser"
 maintainer="biopsin <biopsin@yahoo.no>"
 license="MPL-2.0, GPL-2.0-or-later, LGPL-2.1-or-later"
 homepage="https://www.palemoon.org"
-distfiles="http://archive.palemoon.org/source/${pkgname}-${version}-source.tar.xz"
-checksum=34ba2b78b640f8ff1eb8137bb87a24ab5452eddc0b42fa908e4d5a1a898cfdac
+distfiles="https://repo.palemoon.org/MoonchildProductions/Pale-Moon/archive/${version}_Release.tar.gz"
+checksum=84a5e99542a6b9e7df834a74c6a3cae868ca7ac37d3dbfec1009443fbd639f49
 python_version=2
 lib32disabled=yes
+
+post_extract() {
+	[ ! -f "${XBPS_SRCDISTDIR}/${pkgname}-${version}/${_uxpver}.tar.gz" ] && \
+		curl -o ${XBPS_SRCDISTDIR}/${pkgname}-${version}/${_uxpver}.tar.gz \
+		https://repo.palemoon.org/MoonchildProductions/UXP/archive/RB_${_uxpver}.tar.gz
+	tar --strip-components=1 -xvzf ${XBPS_SRCDISTDIR}/${pkgname}-${version}/${_uxpver}.tar.gz -C platform
+}
 
 do_patch() {
 	cp "${FILESDIR}/mozconfig" "${wrksrc}/.mozconfig"
@@ -29,14 +37,7 @@ pre_configure() {
 	# Remove fuel
 	rm -r "${wrksrc}/palemoon/components/fuel"
 	vsed -i "12d" ${wrksrc}/palemoon/components/moz.build
-}
-
-post_configure() {
-	vsed -i 's|xlocale|locale|' platform/intl/icu/source/i18n/digitlst.cpp
-	vsed -i 's|NSS_ALLOW_SSLKEYLOGFILE=1|NSS_ALLOW_SSLKEYLOGFILE=0|' \
-		platform/config/external/nss/Makefile.in
-	vsed -i 's|enable_sslkeylogfile==1|enable_sslkeylogfile==0|' \
-		platform/security/nss/lib/ssl/ssl.gyp
+	echo "Fuel removed"
 }
 
 do_build() {
