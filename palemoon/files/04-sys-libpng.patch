@@ -1,0 +1,141 @@
+From: wolfbeast <mcwerewolf@wolfbeast.com>
+From e0103f3d5b69b1419496a47ae5d7c9889678d8c9 Mon Sep 17 00:00:00 2001
+Date: Fri, 31 Jan 2020 15:10:26 +0100
+Subject: [PATCH] Issue #1342 - Remove support for system linbpng
+
+
+diff --git a/build/directive4.py b/build/directive4.py
+index 38465628be..009009bf04 100644
+--- platform/build/directive4.py
++++ platform/build/directive4.py
+@@ -36,6 +36,7 @@
+             'MOZ_SYSTEM_JPEG',
+             'MOZ_SYSTEM_ZLIB',
+             'MOZ_SYSTEM_BZ2',
++            'MOZ_SYSTEM_PNG',
+ 			'MOZ_SYSTEM_LIBVPX',
+             'MOZ_SYSTEM_JEMALLOC'
+         ]
+
+diff --git a/build/moz.configure/old.configure b/build/moz.configure/old.configure
+index 03b1d4cdc9..8059adaf17 100644
+--- platform/build/moz.configure/old.configure
++++ platform/build/moz.configure/old.configure
+@@ -292,6 +292,7 @@ def old_configure_options(*options):
+     '--with-system-bz2',
+     '--with-system-jpeg',
+     '--with-system-libvpx',
++    '--with-system-png',	
+     '--with-system-zlib',
+     '--with-thumb',
+     '--with-thumb-interwork',
+diff --git a/config/Makefile.in b/config/Makefile.in
+index 5fe0162f2d..93ad5a80c3 100644
+--- platform/config/Makefile.in
++++ platform/config/Makefile.in
+@@ -44,6 +44,7 @@ export:: $(export-preqs)
+ 		-DMOZ_SYSTEM_HUNSPELL=$(MOZ_SYSTEM_HUNSPELL) \
+ 		-DMOZ_SYSTEM_BZ2=$(MOZ_SYSTEM_BZ2) \
+ 		-DMOZ_SYSTEM_ZLIB=$(MOZ_SYSTEM_ZLIB) \
++		-DMOZ_SYSTEM_PNG=$(MOZ_SYSTEM_PNG) \
+ 		-DMOZ_SYSTEM_JPEG=$(MOZ_SYSTEM_JPEG) \
+ 		-DMOZ_SYSTEM_LIBVPX=$(MOZ_SYSTEM_LIBVPX) \
+ 		$(srcdir)/system-headers $(srcdir)/stl-headers | $(PERL) $(topsrcdir)/nsprpub/config/make-system-wrappers.pl system_wrappers
+diff --git a/config/external/moz.build b/config/external/moz.build
+index fbf6da0892..0125335547 100644
+--- platform/config/external/moz.build
++++ platform/config/external/moz.build
+@@ -36,7 +36,8 @@ if not CONFIG['MOZ_SYSTEM_LIBVPX']:
+ if CONFIG['MOZ_AV1']:
+     external_dirs += ['media/libaom']
+ 
++if not CONFIG['MOZ_SYSTEM_PNG']:
++    external_dirs += ['media/libpng']
+-external_dirs += ['media/libpng']
+ 
+ external_dirs += ['media/libwebp']
+ 
+diff --git a/config/system-headers b/config/system-headers
+index a2d3b813d7..9dd33bc768 100644
+--- platform/config/system-headers
++++ platform/config/system-headers
+@@ -1253,6 +1253,9 @@ soundtouch/SoundTouchFactory.h
+ #if MOZ_LIBAV_FFT==1
+ libavcodec/avfft.h
+ #endif
++#if MOZ_SYSTEM_PNG==1
++png.h
++#endif
+ #if MOZ_SYSTEM_ZLIB==1
+ zlib.h
+ #endif
+diff --git a/old-configure.in b/old-configure.in
+index 530a704716..cc1b20feac 100644
+--- platform/old-configure.in
++++ platform/old-configure.in
+@@ -2092,6 +2092,51 @@ if test "${BZ2_DIR}" -a -d "${BZ2_DIR}" -a "$MOZ_SYSTEM_BZ2" = 1; then
+     MOZ_BZ2_LIBS="-L${BZ2_DIR}/lib ${MOZ_BZ2_LIBS}"
+ fi
+ 
++dnl ========================================================
++dnl system PNG Support
++dnl ========================================================
++MOZ_ARG_WITH_STRING(system-png,
++[  --with-system-png[=PFX]
++                          Use system libpng [installed at prefix PFX]],
++    PNG_DIR=$withval)
++
++_SAVE_CFLAGS=$CFLAGS
++_SAVE_LDFLAGS=$LDFLAGS
++_SAVE_LIBS=$LIBS
++if test -n "${PNG_DIR}" -a "${PNG_DIR}" != "yes"; then
++    CFLAGS="-I${PNG_DIR}/include $CFLAGS"
++    LDFLAGS="-L${PNG_DIR}/lib $LDFLAGS"
++fi
++if test -z "$PNG_DIR" -o "$PNG_DIR" = no; then
++    MOZ_SYSTEM_PNG=
++else
++    AC_CHECK_LIB(png, png_get_valid, [MOZ_SYSTEM_PNG=1 MOZ_PNG_LIBS="-lpng"],
++                 AC_MSG_ERROR([--with-system-png requested but no working libpng found]))
++    AC_CHECK_LIB(png, png_get_acTL, ,
++                 AC_MSG_ERROR([--with-system-png won't work because the system's libpng doesn't have APNG support]))
++fi
++if test "$MOZ_SYSTEM_PNG" = 1; then
++    AC_TRY_COMPILE([ #include <stdio.h>
++                     #include <sys/types.h>
++                     #include <png.h> ],
++                   [ #if PNG_LIBPNG_VER < $MOZPNG
++                     #error "Insufficient libpng version ($MOZPNG required)."
++                     #endif
++                     #ifndef PNG_UINT_31_MAX
++                     #error "Insufficient libpng version."
++                     #endif ],
++                   MOZ_SYSTEM_PNG=1,
++                   AC_MSG_ERROR([--with-system-png requested but no working libpng found]))
++fi
++CFLAGS=$_SAVE_CFLAGS
++LDFLAGS=$_SAVE_LDFLAGS
++LIBS=$_SAVE_LIBS
++
++if test "${PNG_DIR}" -a -d "${PNG_DIR}" -a "$MOZ_SYSTEM_PNG" = 1; then
++    MOZ_PNG_CFLAGS="-I${PNG_DIR}/include"
++    MOZ_PNG_LIBS="-L${PNG_DIR}/lib ${MOZ_PNG_LIBS}"
++fi
++
+ fi # SKIP_LIBRARY_CHECKS
+ 
+ dnl ========================================================
+diff --git a/toolkit/library/moz.build b/toolkit/library/moz.build
+index 85a7351ba3..506db8fef9 100644
+--- platform/toolkit/library/moz.build
++++ platform/toolkit/library/moz.build
+@@ -195,6 +195,9 @@ if CONFIG['SERVO_TARGET_DIR']:
+ if CONFIG['MOZ_SYSTEM_JPEG']:
+     OS_LIBS += CONFIG['MOZ_JPEG_LIBS']
+ 
++if CONFIG['MOZ_SYSTEM_PNG']:
++    OS_LIBS += CONFIG['MOZ_PNG_LIBS']
++
+ if CONFIG['MOZ_SYSTEM_HUNSPELL']:
+     OS_LIBS += CONFIG['MOZ_HUNSPELL_LIBS']
+ 

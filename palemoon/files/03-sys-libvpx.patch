@@ -1,0 +1,160 @@
+From: wolfbeast <mcwerewolf@wolfbeast.com>
+From 229f8412959a9480a9fa1784d6619aa5e97320c3 Mon Sep 17 00:00:00 2001
+Date: Fri, 31 Jan 2020 16:54:07 +0100
+Subject: [PATCH] Issue #1342 - Remove support for system libvpx
+
+
+diff --git a/build/directive4.py b/build/directive4.py
+index 9150a25438..650349d689 100644
+--- platform/build/directive4.py
++++ platform/build/directive4.py
+@@ -36,6 +36,7 @@
+             'MOZ_SYSTEM_JPEG',
+             'MOZ_SYSTEM_ZLIB',
+             'MOZ_SYSTEM_BZ2',
++			'MOZ_SYSTEM_LIBVPX',
+             'MOZ_SYSTEM_JEMALLOC'
+         ]
+         
+
+diff --git a/build/moz.configure/old.configure b/build/moz.configure/old.configure
+index a8e82cb793..df955f0017 100644
+--- platform/build/moz.configure/old.configure
++++ platform/build/moz.configure/old.configure
+@@ -287,6 +287,7 @@ def old_configure_options(*options):
+     '--with-soft-float',
+     '--with-system-bz2',
+     '--with-system-jpeg',
++    '--with-system-libvpx',
+     '--with-system-zlib',
+     '--with-thumb',
+     '--with-thumb-interwork',
+diff --git a/config/Makefile.in b/config/Makefile.in
+index 93ad5a80c3..c9cc3592c6 100644
+--- platform/config/Makefile.in
++++ platform/config/Makefile.in
+@@ -45,6 +45,7 @@
+ 		-DMOZ_SYSTEM_BZ2=$(MOZ_SYSTEM_BZ2) \
+ 		-DMOZ_SYSTEM_ZLIB=$(MOZ_SYSTEM_ZLIB) \
+ 		-DMOZ_SYSTEM_JPEG=$(MOZ_SYSTEM_JPEG) \
++		-DMOZ_SYSTEM_LIBVPX=$(MOZ_SYSTEM_LIBVPX) \
+ 		$(srcdir)/system-headers $(srcdir)/stl-headers | $(PERL) $(topsrcdir)/nsprpub/config/make-system-wrappers.pl system_wrappers
+ 	$(INSTALL) system_wrappers $(DIST)
+ 
+
+diff --git a/config/external/moz.build b/config/external/moz.build
+index 0125335547..321ca3a5b5 100644
+--- platform/config/external/moz.build
++++ platform/config/external/moz.build
+@@ -30,7 +30,8 @@ if CONFIG['MOZ_TREMOR']:
+ if CONFIG['MOZ_WEBM_ENCODER']:
+     external_dirs += ['media/libmkv']
+ 
++if not CONFIG['MOZ_SYSTEM_LIBVPX']:
++    external_dirs += ['media/libvpx']
+-external_dirs += ['media/libvpx']
+ 
+ if CONFIG['MOZ_AV1']:
+     external_dirs += ['media/libaom']
+diff --git a/config/system-headers b/config/system-headers
+index 9dd33bc768..3685d6d1c3 100644
+--- platform/config/system-headers
++++ platform/config/system-headers
+@@ -1288,6 +1288,15 @@ QtSparql/qsparqlresult.h
+ #if MOZ_TREE_PIXMAN!=1
+ pixman.h
+ #endif
++#if MOZ_SYSTEM_LIBVPX==1
++vpx/svc_context.h
++vpx/vpx_codec.h
++vpx/vpx_decoder.h
++vpx/vpx_encoder.h
++vpx/vp8cx.h
++vpx/vp8dx.h
++vpx_mem/vpx_mem.h
++#endif
+ gst/gst.h
+ gst/app/gstappsink.h
+ gst/app/gstappsrc.h
+diff --git a/media/webrtc/signaling/test/common.build b/media/webrtc/signaling/test/common.build
+index 3e5450f5d6..2d9a571392 100644
+--- platform/media/webrtc/signaling/test/common.build
++++ platform/media/webrtc/signaling/test/common.build
+@@ -105,6 +105,9 @@ if CONFIG['MOZ_ALSA']:
+ if CONFIG['MOZ_SYSTEM_JPEG']:
+     OS_LIBS += CONFIG['MOZ_JPEG_LIBS']
+ 
++if CONFIG['MOZ_SYSTEM_LIBVPX']:
++    OS_LIBS += CONFIG['MOZ_LIBVPX_LIBS']
++
+ if not CONFIG['MOZ_TREE_PIXMAN']:
+     OS_LIBS += CONFIG['MOZ_PIXMAN_LIBS']
+ 
+diff --git a/old-configure.in b/old-configure.in
+index 8e1a7258eb..a7b0ce6b97 100644
+--- platform/old-configure.in
++++ platform/old-configure.in
+@@ -2918,6 +2918,13 @@ if test -n "$MOZ_EME"; then
+     AC_DEFINE(MOZ_EME)
+ fi
+ 
++dnl ========================================================
++dnl system libvpx Support
++dnl ========================================================
++MOZ_ARG_WITH_BOOL(system-libvpx,
++[  --with-system-libvpx    Use system libvpx (located with pkgconfig)],
++    MOZ_SYSTEM_LIBVPX=1)
++
+ MOZ_LIBVPX_CFLAGS=
+ MOZ_LIBVPX_LIBS=
+ 
+@@ -2925,6 +2932,35 @@ if test -n "$MOZ_VPX_ERROR_CONCEALMENT" ; then
+     AC_DEFINE(MOZ_VPX_ERROR_CONCEALMENT)
+ fi
+ 
++_SAVE_CFLAGS=$CFLAGS
++_SAVE_LIBS=$LIBS
++if test -n "$MOZ_SYSTEM_LIBVPX"; then
++    dnl ============================
++    dnl === libvpx Version check ===
++    dnl ============================
++    dnl Check to see if we have a system libvpx package.
++    PKG_CHECK_MODULES(MOZ_LIBVPX, vpx >= 1.5.0)
++
++    CFLAGS="$CFLAGS $MOZ_LIBVPX_CFLAGS"
++    LIBS="$LIBS $MOZ_LIBVPX_LIBS"
++
++    MOZ_CHECK_HEADER([vpx/vpx_decoder.h], [],
++     [AC_MSG_ERROR([Couldn't find vpx/vpx_decoder.h which is required for build with system libvpx. Use --without-system-libvpx to build with in-tree libvpx.])])
++
++    AC_CHECK_LIB(vpx, vpx_codec_dec_init_ver, [],
++     [AC_MSG_ERROR([--with-system-libvpx requested but symbol vpx_codec_dec_init_ver not found])])
++
++    MOZ_CHECK_HEADER([vpx_mem/vpx_mem.h],
++     [AC_CHECK_FUNC(vpx_mem_set_functions)])
++    if test "$ac_cv_header_vpx_mem_vpx_mem_h" = no -o \
++            "$ac_cv_func_vpx_mem_set_functions" = no; then
++        AC_DEFINE(MOZ_VPX_NO_MEM_REPORTING)
++    fi
++fi
++CFLAGS=$_SAVE_CFLAGS
++LIBS=$_SAVE_LIBS
++
++AC_SUBST(MOZ_SYSTEM_LIBVPX)
+ AC_SUBST_LIST(MOZ_LIBVPX_CFLAGS)
+ AC_SUBST_LIST(MOZ_LIBVPX_LIBS)
+ 
+diff --git a/toolkit/library/moz.build b/toolkit/library/moz.build
+index 506db8fef9..3056799f0e 100644
+--- platform/toolkit/library/moz.build
++++ platform/toolkit/library/moz.build
+@@ -198,6 +198,9 @@ if CONFIG['MOZ_SYSTEM_JPEG']:
+ if CONFIG['MOZ_SYSTEM_HUNSPELL']:
+     OS_LIBS += CONFIG['MOZ_HUNSPELL_LIBS']
+ 
++if CONFIG['MOZ_SYSTEM_LIBVPX']:
++    OS_LIBS += CONFIG['MOZ_LIBVPX_LIBS']
++
+ if not CONFIG['MOZ_TREE_PIXMAN']:
+     OS_LIBS += CONFIG['MOZ_PIXMAN_LIBS']
+ 
