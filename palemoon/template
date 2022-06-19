@@ -1,8 +1,8 @@
 # Template file for 'Pale Moon'
 pkgname=palemoon
-version=31.0.0
+version=31.1.0
 revision=1
-_uxpver=20220510
+_uxpver=20220607_2
 wrksrc="pale-moon"
 hostmakedepends="curl autoconf213 unzip zip pkg-config perl python yasm tar which"
 makedepends="python-devel libatomic-devel gtk+-devel libXt-devel alsa-lib-devel
@@ -13,7 +13,7 @@ maintainer="biopsin <biopsin@yahoo.no>"
 license="MPL-2.0, GPL-2.0-or-later, LGPL-2.1-or-later"
 homepage="https://www.palemoon.org"
 distfiles="https://repo.palemoon.org/MoonchildProductions/Pale-Moon/archive/${version}_Release.tar.gz"
-checksum=84a5e99542a6b9e7df834a74c6a3cae868ca7ac37d3dbfec1009443fbd639f49
+checksum=73637f0c12244da40cdaa11c98a2c0f92dc9de3aba1f878065606a22d1a1bbaa
 python_version=2
 lib32disabled=yes
 
@@ -58,6 +58,10 @@ do_install() {
 
 	vinstall ${wrksrc}/palemoon/branding/unofficial/browser.desktop 644 \
 		usr/share/applications palemoon.desktop
+
+	// FIX: prefix away from /usr/local
+	cp -r ${DESTDIR}/usr/local/lib/palemoon ${DESTDIR}/usr/lib
+	mkdir ${DESTDIR}/usr/bin
 
 	# https://bugzilla.mozilla.org/show_bug.cgi?id=658850
 	ln -sf palemoon ${DESTDIR}/usr/lib/palemoon/palemoon-bin
