@@ -1,8 +1,8 @@
 # Template file for 'Pale Moon'
 pkgname=palemoon
-version=31.1.0
+version=31.1.1
 revision=1
-_uxpver=20220607_2
+_uxpver=20220707
 wrksrc="pale-moon"
 hostmakedepends="curl autoconf213 unzip zip pkg-config perl python yasm tar which"
 makedepends="python-devel libatomic-devel gtk+-devel libXt-devel alsa-lib-devel
@@ -13,20 +13,19 @@ maintainer="biopsin <biopsin@yahoo.no>"
 license="MPL-2.0, GPL-2.0-or-later, LGPL-2.1-or-later"
 homepage="https://www.palemoon.org"
 distfiles="https://repo.palemoon.org/MoonchildProductions/Pale-Moon/archive/${version}_Release.tar.gz"
-checksum=73637f0c12244da40cdaa11c98a2c0f92dc9de3aba1f878065606a22d1a1bbaa
+checksum=b0503d32338bc9f9e14b32c4acec7f3e09802b3990b979ab75e2077b1e9bd6be
 python_version=2
 lib32disabled=yes
 
 post_extract() {
 	[ ! -f "${XBPS_SRCDISTDIR}/${pkgname}-${version}/${_uxpver}.tar.gz" ] && \
 		curl -o ${XBPS_SRCDISTDIR}/${pkgname}-${version}/${_uxpver}.tar.gz \
-		https://repo.palemoon.org/MoonchildProductions/UXP/archive/RB_${_uxpver}.tar.gz
+		https://repo.palemoon.org/MoonchildProductions/UXP/archive/RB${_uxpver}.tar.gz
 	tar --strip-components=1 -xvzf ${XBPS_SRCDISTDIR}/${pkgname}-${version}/${_uxpver}.tar.gz -C platform
 }
 
 do_patch() {
 	cp "${FILESDIR}/mozconfig" "${wrksrc}/.mozconfig"
-	mkdir -p /usr/lib/palemoon
 
 	for p in ${FILESDIR}/*.patch; do
 		patch -Np0 -i $p
@@ -59,12 +58,9 @@ do_install() {
 	vinstall ${wrksrc}/palemoon/branding/unofficial/browser.desktop 644 \
 		usr/share/applications palemoon.desktop
 
-	// FIX: prefix away from /usr/local
-	cp -r ${DESTDIR}/usr/local/lib/palemoon ${DESTDIR}/usr/lib
-	mkdir ${DESTDIR}/usr/bin
-
 	# https://bugzilla.mozilla.org/show_bug.cgi?id=658850
-	ln -sf palemoon ${DESTDIR}/usr/lib/palemoon/palemoon-bin
+	ln -sf ${PKGDESTDIR}/usr/bin/palemoon palemoon-bin
+	ln -sf palemoon ${PKGDESTDIR}/usr/lib/palemoon/palemoon-bin
 
 	# Remove the devel and etc
 	rm -r ${DESTDIR}/usr/{include,lib/palemoon-devel,share/idl}
