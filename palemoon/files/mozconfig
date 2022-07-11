@@ -1,24 +1,13 @@
-# Clear this if not a 64bit build
-_BUILD_64=1
-
 # Set GTK Version to 2 or 3
 _GTK_VERSION=2
 
+# Standard build options for Pale Moon
 ac_add_options --enable-application=palemoon
 ac_add_options --enable-optimize="$CFLAGS"
 ac_add_options --enable-default-toolkit=cairo-gtk$_GTK_VERSION
+ac_add_options --enable-jemalloc
 ac_add_options --enable-pie
 ac_add_options --enable-av1
-
-# Use system libs
-ac_add_options --enable-system-pixman
-ac_add_options --enable-system-ffi
-#ac_add_options --with-system-cairo
-ac_add_options --with-system-zlib
-ac_add_options --with-system-bz2
-ac_add_options --with-system-jpeg
-ac_add_options --with-system-libvpx
-ac_add_options --with-system-png
 
 # Custom disabled
 ac_add_options --disable-gconf
@@ -33,29 +22,17 @@ ac_add_options --disable-devtools
 ac_add_options --disable-profiling
 ac_add_options --disable-userinfo
 ac_add_options --disable-sync
-
-# Official disabled
-ac_add_options --disable-eme
-ac_add_options --disable-webrtc
 ac_add_options --disable-gamepad
 ac_add_options --disable-tests
-ac_add_options --disable-debug
 ac_add_options --disable-debug-symbols
+ac_add_options --disable-debug
 ac_add_options --disable-necko-wifi
 ac_add_options --disable-updater
-
 ac_add_options --with-pthreads
-ac_add_options --prefix=/usr
 
-# Processor architecture specific build options
-if [ -n "$_BUILD_64" ]; then
-  ac_add_options --x-libraries=/usr/lib64
-else
-  ac_add_options --x-libraries=/usr/lib
-fi
-
-export MOZ_PKG_SPECIAL=gtk$_GTK_VERSION
-
+# Please see https://www.palemoon.org/redist.shtml for restrictions when using the official branding.
+#ac_add_options --enable-official-branding
+#export MOZILLA_OFFICIAL=1
 ac_add_options --disable-official-branding
 ac_add_options --disable-official-vendor
 ac_add_options --with-user-appdir=.palemoon
@@ -63,3 +40,8 @@ export MOZ_APP_PROFILE=palemoon
 export MOZ_APP_VENDOR=.palemoon
 export MOZ_USER_DIR=.palemoon
 export MOZILLA_OFFICIAL=0
+
+ac_add_options --x-libraries=/usr/lib64
+ac_add_options --prefix=/usr
+
+export MOZ_PKG_SPECIAL=gtk$_GTK_VERSION
