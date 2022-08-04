@@ -1,6 +1,6 @@
 # Template file for 'libnotify'
 pkgname=libnotify
-version=0.7.9
+version=0.8.1
 revision=1
 build_style=meson
 build_helper="gir"
@@ -13,7 +13,7 @@ maintainer="Orphaned <orphan@voidlinux.org>"
 license="LGPL-2.1-or-later"
 homepage="http://library.gnome.org/devel/notification-spec/"
 distfiles="${GNOME_SITE}/${pkgname}/0.7/${pkgname}-${version}.tar.xz"
-checksum=66c0517ed16df7af258e83208faaf5069727dfd66995c4bbc51c16954d674761
+checksum=d033e6d4d6ccbf46a436c31628a4b661b36dca1f5d4174fe0173e274f4e62557
 
 # Package build options
 build_options="gir"
