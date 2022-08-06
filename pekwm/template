@@ -1,22 +1,21 @@
 # Template file for 'pekwm'
 pkgname=pekwm
 version=0.2.1
-revision=1
-wrksrc="${pkgname}-release-${version}"
+revision=4
+_commit=3f364c5d6ebb66a8b5a462584ed317c9319b3a18
+wrksrc="pekwm-${_commit}"
 build_style=cmake
 configure_args="-DENABLE_SHAPE=OFF -DENABLE_XINERAMA=OFF
  -DENABLE_RANDR=OFF -DENABLE_XFT=ON -DENABLE_IMAGE_XPM=OFF
  -DENABLE_IMAGE_JPEG=OFF -DENABLE_IMAGE_PNG=OFF"
-hostmakedepends="pkg-config"
-makedepends="libjpeg-turbo-devel libpng-devel libXpm-devel
- libXft-devel fontconfig-devel libXinerama-devel libXrandr-devel"
-short_desc="Window manager based on aewm++"
-maintainer="Orphaned <orphan@voidlinux.org>"
-license="GPL-2.0-or-later"
-homepage="https://www.pekwm.se/"
-distfiles="https://github.com/pekdon/pekwm/archive/refs/tags/release-${version}.tar.gz"
-checksum=62e858015e1a5a54bbddab202a1fb455c821bda62498e9cadfa1d00a5a2575c3
+makedepends="libXft-devel libXrender-devel"
 conf_files="/etc/pekwm/*"
+short_desc="Window manager based on aewm++"
+maintainer="biopsin <biopsin@teknik.io>"
+license="GPL-2.0-or-later"
+homepage="https://www.pekwm.org/projects/pekwm"
+distfiles="https://github.com/pekdon/pekwm/archive/${_commit}.tar.gz"
+checksum=19194fea565d2c1f939d409339b1a5b2287317cf4ad40e9222e085e81dd75d3b
 
 post_install() {
     rm -r ${DESTDIR}/usr/share/pekwm/themes/default
