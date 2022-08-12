@@ -1,0 +1,19 @@
+# Template file for 'BSchaffl'
+pkgname=BSchaffl
+version=1.4.10
+revision=1
+build_style=gnu-makefile
+make_use_env=yes
+make_build_args="all"
+hostmakedepends="pkg-config"
+makedepends="libX11-devel cairo-devel lv2"
+short_desc="Groove quantizer LV2 MIDI plugin"
+maintainer="biopsin <biopsin@teknik.io>"
+license="GPL-3.0-or-later"
+homepage="https://github.com/sjaehn/BSchaffl"
+distfiles="${homepage}/archive/refs/tags/${version}.tar.gz"
+checksum=f661255eaf493b72932c8f0fffdf4fbe76c5e4276cffb4a0459d4c11c95b427c
+
+post_install() {
+	vlicense LICENSE
+}
