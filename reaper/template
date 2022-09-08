@@ -15,7 +15,7 @@ nopie=yes
 # TODO: Build our own libSwell.so
 
 case "${XBPS_TARGET_MACHINE}" in
-	x86_64) checksum=0f7296b689685a55e945e807254cc862fe09fdedc338cb75de3254ebc1b65191 ;;
+	x86_64) checksum=3012a5e000d2182d06c5fae149fa904cce9860900681499a6f297f03e0eb8eb3 ;;
 	i686) checksum=7113779ed27bca2c6ce5b4ca63a12c48ed086588564f02b89c5fb63b5c327952 ;;
 	armv7l) checksum=117daa711a1e67156994e56ca76bada6349536fab6f239ff65422d4183c8e4a5 ;;
 	aarch64) checksum=70564397a87a7980ae1f2fcadc5b1643c8337ade2a1aa180adb0dcbe03e14553 ;;
