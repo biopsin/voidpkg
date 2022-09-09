@@ -1,0 +1,31 @@
+--- a/Makefile	2022-09-01 16:42:03.000000000 +0200
++++ b/Makefile	2022-09-09 18:03:54.162964829 +0200
+@@ -149,7 +149,8 @@
+ CONFIG_ROAMING_FLAG = 0x3
+ 
+ ###################### Platform Related #######################
+-CONFIG_PLATFORM_I386_PC = y
++CONFIG_PLATFORM_VOID_NATIVE = y
++CONFIG_PLATFORM_I386_PC = n
+ CONFIG_PLATFORM_RTL8198D = n
+ CONFIG_PLATFORM_ANDROID_X86 = n
+ CONFIG_PLATFORM_ANDROID_INTEL_X86 = n
+@@ -508,6 +509,18 @@
+ 
+ ifeq ($(CONFIG_MP_VHT_HW_TX_MODE), y)
+ EXTRA_CFLAGS += -DCONFIG_MP_VHT_HW_TX_MODE
++
++ifeq ($(CONFIG_PLATFORM_VOID_NATIVE), y)
++EXTRA_CFLAGS += -DCONFIG_@@VOID_ENDIAN@@_ENDIAN
++EXTRA_CFLAGS += -DCONFIG_IOCTL_CFG80211 -DRTW_USE_CFG80211_STA_EVENT
++ARCH := @@VOID_ARCH@@
++KVER ?= $(shell uname -r)
++KSRC ?= /usr/lib/modules/$(KVER)/build
++MODDESTDIR := /usr/lib/modules/$(KVER)/kernel/drivers/net/wireless/
++INSTALL_PREFIX :=
++STAGINGMODDIR := /usr/lib/modules/$(KVER)/kernel/drivers/staging
++endif
++
+ ifeq ($(CONFIG_PLATFORM_I386_PC), y)
+ ## For I386 X86 ToolChain use Hardware FLOATING
+ EXTRA_CFLAGS += -mhard-float
