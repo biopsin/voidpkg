@@ -2,6 +2,7 @@
 pkgname=rtl8852au-dkms
 version=20220901
 revision=1
+_modver=1.15.0.1
 _gitrev=8f8f9abb9523a758e67cdad56743a9a89892bb8e
 wrksrc="rtl8852au-${_gitrev}"
 depends="dkms"
