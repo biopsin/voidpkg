@@ -34,13 +34,13 @@ post_patch() {
 }
 
 do_install() {
-	vmkdir /usr/src/88x2au-${version}
-	vcopy "*" usr/src/88x2au-${version}
-	vinstall ${FILESDIR}/dkms.conf 644 usr/src/88x2au-${version}
-	sed -i -e "s/@VERSION@/${version}-${revision}/" ${PKGDESTDIR}/usr/src/88x2au-${version}/dkms.conf
+	vmkdir /usr/src/8852au-${version}
+	vcopy "*" usr/src/8852au-${version}
+	vinstall ${FILESDIR}/dkms.conf 644 usr/src/8852au-${version}
+	sed -i -e "s/@VERSION@/${version}-${revision}/" ${PKGDESTDIR}/usr/src/8852au-${version}/dkms.conf
 
 	# modules-load.d(5) file.
 	vmkdir usr/lib/modules-load.d
-	echo "88x2au" > ${DESTDIR}/usr/lib/modules-load.d/88x2au.conf
-	chmod 644 ${DESTDIR}/usr/lib/modules-load.d/88x2au.conf
+	echo "8852au" > ${DESTDIR}/usr/lib/modules-load.d/8852au.conf
+	chmod 644 ${DESTDIR}/usr/lib/modules-load.d/8852au.conf
 }
