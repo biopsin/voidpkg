@@ -1,0 +1,14 @@
+# Template file for 'ratx'
+pkgname=ratx
+version=211107
+revision=1
+_commit=177d6b7cd1d34ff6f50bad83f53429577d2d3539
+wrksrc="remote_touchpad-${_commit}"
+build_style="gnu-makefile"
+makedepends="libevent-devel"
+short_desc="Remote android touchpad for X"
+maintainer="biopsin <biopsin@gmail.com>"
+license="custom"
+homepage="https://github.com/twaik/remote_touchpad"
+distfiles="$homepage/archive/${_commit}.tar.gz"
+checksum=6d4d0fd105bae1588bfc048b265e5e8d9253c29f8e91b0e70684f0a4c78edb46
