@@ -1,8 +1,8 @@
 # Template file for 'Pale Moon'
 pkgname=palemoon
-version=31.2.0.1
+version=31.3.1
 revision=1
-_uxpver=20220802
+_uxpver=RB_20221101
 wrksrc="pale-moon"
 hostmakedepends="curl autoconf213 unzip zip pkg-config perl python yasm tar which"
 makedepends="python-devel libatomic-devel gtk+-devel libXt-devel alsa-lib-devel
@@ -13,14 +13,14 @@ maintainer="biopsin <biopsin@yahoo.no>"
 license="MPL-2.0, GPL-2.0-or-later, LGPL-2.1-or-later"
 homepage="https://www.palemoon.org"
 distfiles="https://repo.palemoon.org/MoonchildProductions/Pale-Moon/archive/${version}_Release.tar.gz"
-checksum=e9bd7499b99201dbfd72c160e9f25198f65efc60e114b41a538e42b6ba51f0c2
+checksum=50c455f141b6568ee66e8a81f3a828a89364c707c171e1c9a869fa8d2eed2983
 python_version=2
 lib32disabled=yes
 
 post_extract() {
 	[ ! -f "${XBPS_SRCDISTDIR}/${pkgname}-${version}/${_uxpver}.tar.gz" ] && \
 		curl -o ${XBPS_SRCDISTDIR}/${pkgname}-${version}/${_uxpver}.tar.gz \
-		https://repo.palemoon.org/MoonchildProductions/UXP/archive/RB_${_uxpver}.tar.gz
+		https://repo.palemoon.org/MoonchildProductions/UXP/archive/${_uxpver}.tar.gz
 	tar --strip-components=1 -xvzf ${XBPS_SRCDISTDIR}/${pkgname}-${version}/${_uxpver}.tar.gz -C platform
 }
 
