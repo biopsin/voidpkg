@@ -2,7 +2,7 @@
 pkgname=libSwell
 version=221128
 revision=1
-_commit="51dfe0f46f73472a494029f9c87e7816a0f01963"
+_commit="a54057a1539a630c0bce4ca7b406d43874dec9ff"
 wrksrc="WDL-${_commit}"
 make_build_args="GDK2=1"
 hostmakedepends="pkg-config"
