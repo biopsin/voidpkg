@@ -14,6 +14,11 @@ homepage="https://github.com/justinfrankel/WDL"
 distfiles="${homepage}/archive/${_commit}.zip"
 checksum=97715379c5dab85ced8698d482b9bb23ea443360e333c8a501ba57363ba6d0f8
 
+post_configure() {
+	# patch this gtk2 breakage for now
+	rm ${wrksrc}/WDL/swell/gtkimcontextsimpleseqs.h
+}
+
 do_build() {
     cd ${wrksrc}/WDL/swell
     make ${make_build_args}
