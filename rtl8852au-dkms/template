@@ -1,8 +1,8 @@
 # Template file for 'rtl8852au-dkms'
 pkgname=rtl8852au-dkms
-version=20220901
+version=20230209
 revision=1
-_gitrev=8f8f9abb9523a758e67cdad56743a9a89892bb8e
+_gitrev=42e5107723c0b23bdfb97bbc163d4388ea583dc9
 wrksrc="rtl8852au-${_gitrev}"
 depends="dkms"
 short_desc="Realtek 8832au/8852au USB WiFi driver (DKMS)"
@@ -10,7 +10,7 @@ maintainer="biopsin <biopsin@teknik.io>"
 license="GPL-2.0-only"
 homepage="http://www.dlink.com"
 distfiles="https://github.com/lwfinger/rtl8852au/archive/${_gitrev}.tar.gz"
-checksum=f6aefbc863d37fc74fa4242d6dab4a6d4b9369bb22b03cd8bf75b738f38ff57e
+checksum=9e374bb911301bf1c0601c564297c11c0fec35e65fad5e5a27b4d826c6ba748c
 dkms_modules="8852au ${version}"
 
 case "$XBPS_TARGET_MACHINE" in
