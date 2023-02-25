@@ -1,0 +1,23 @@
+# Template file for 'tabbed'
+pkgname=tabbed
+version=0.7
+revision=1
+_commit=41e2b8f30667078a4da04d5bd3d9eb839b118895
+wrksrc="tabbed-${_commit}"
+build_style=gnu-makefile
+makedepends="libX11-devel libXft-devel"
+short_desc="Tab interface for application supporting Xembed"
+maintainer="Orphaned <orphan@voidlinux.org>"
+license="MIT"
+homepage="http://tools.suckless.org/tabbed/"
+distfiles="https://github.com/zetatez/suckless-tabbed/archive/${_commit}.tar.gz"
+checksum=3c490f06ad4da55928b25355191c9fe8943c6b9160e419a04c256e6ad4b2e56b
+
+pre_build() {
+	cp -f ${FILESDIR}/config.def.h .
+	sed -i 's|X11R6/||g' Makefile
+}
+
+post_install() {
+	vlicense LICENSE
+}
