@@ -1,7 +1,7 @@
 /* See LICENSE file for copyright and license details. */
 
 /* appearance */
-static const char font[]              = "monospace:size=12";
+static const char font[]              = "monospace:size=13";
 static const char* normbgcolor  = "#f2f2f2";
 static const char* normfgcolor   = "#2d2d2d";
 static const char* selbgcolor     = "#fef7e4";
@@ -15,7 +15,7 @@ static const int  tabwidth          = 200;
 static const Bool foreground      = True;
 static       Bool urgentswitch       = False;
 
-static const int barHeight         = 18;
+static const int barHeight         = 26;
 
 /*
  * Where to place a new tab when it is opened. When npisrelative is True,
