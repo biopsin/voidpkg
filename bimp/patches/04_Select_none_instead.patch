@@ -1,0 +1,33 @@
+From 58ed019bcc5f0eb405da0e82d68058204c16fa17 Mon Sep 17 00:00:00 2001
+From: bbbbbr <bbbbbr@users.noreply.github.com>
+Date: Wed, 23 Mar 2022 10:20:24 -0700
+Subject: [PATCH] Select none instead of all before calling user specified
+ plugin
+
+This PR originates with a ticket opened for my GIMP plugin Pixel Art Scalers:
+https://github.com/bbbbbr/gimp-plugin-pixel-art-scalers/issues/15
+
+Currently `apply_userdef()` calls `gimp_selection_all()` shortly before running the user specified plugin call.
+
+In most cases this is ok, however with my plugin which `resizes` the image and drawable layer, but does not `rescale` the image using libgimp calls. My plugin honors selection regions since there are cases where they might want to resize just a subset of the source image.
+
+What this means is that the Select All area selection doesn't grow when the image gets `resized`, so the upscaled output gets cropped to the original image dimensions. When no selection area is specified then the resized drawable is able to update it's full area.
+
+It's unclear whether there is a specific purpose for `gimp_selection_all()` or if `gimp_selection_none()` would be an acceptable alternative
+---
+ src/bimp-operate.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/bimp-operate.c b/src/bimp-operate.c
+index f030bda..c72dc2b 100644
+--- a/src/bimp-operate.c
++++ b/src/bimp-operate.c
+@@ -948,7 +948,7 @@ static gboolean apply_userdef(userdef_settings settings, image_output out)
+     gboolean saving_function = (strstr(settings->procedure, "-save") != NULL);
+     
+     int single_drawable = gimp_image_merge_visible_layers(out->image_id, GIMP_CLIP_TO_IMAGE);
+-	gimp_selection_all(out->image_id);
++	gimp_selection_none(out->image_id);
+     
+     for (param_i = 0; param_i < settings->num_params; param_i++) {
+         switch((settings->params[param_i]).type) {

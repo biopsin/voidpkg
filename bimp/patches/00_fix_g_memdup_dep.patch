@@ -1,0 +1,31 @@
+--- a/src/bimp-serialize.c	2021-01-08 00:36:42.000000000 +0100
++++ b/src/bimp-serialize.c	2021-04-28 15:30:15.579155576 +0200
+@@ -527,23 +527,23 @@
+             // save in the proper variables
+             if (strcmp(channel_name, "value") == 0) {
+                 *num_points_v = num_points_temp;
+-                *ctr_points_v = g_memdup(ctr_points_temp, num_points_temp * sizeof(gdouble));
++                *ctr_points_v = g_memdup2(ctr_points_temp, num_points_temp * sizeof(gdouble));
+             }
+             else if (strcmp(channel_name, "red") == 0) {
+                 *num_points_r = num_points_temp;
+-                *ctr_points_r = g_memdup(ctr_points_temp, num_points_temp * sizeof(gdouble));
++                *ctr_points_r = g_memdup2(ctr_points_temp, num_points_temp * sizeof(gdouble));
+             }
+             else if (strcmp(channel_name, "green") == 0) {
+                 *num_points_g = num_points_temp;
+-                *ctr_points_g = g_memdup(ctr_points_temp, num_points_temp * sizeof(gdouble));
++                *ctr_points_g = g_memdup2(ctr_points_temp, num_points_temp * sizeof(gdouble));
+             }
+             else if (strcmp(channel_name, "blue") == 0) {
+                 *num_points_b = num_points_temp;
+-                *ctr_points_b = g_memdup(ctr_points_temp, num_points_temp * sizeof(gdouble));
++                *ctr_points_b = g_memdup2(ctr_points_temp, num_points_temp * sizeof(gdouble));
+             }
+             else if (strcmp(channel_name, "alpha") == 0) {
+                 *num_points_a = num_points_temp;
+-                *ctr_points_a = g_memdup(ctr_points_temp, num_points_temp * sizeof(gdouble));
++                *ctr_points_a = g_memdup2(ctr_points_temp, num_points_temp * sizeof(gdouble));
+             }
+             else goto err;
+             
