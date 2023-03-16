@@ -1,8 +1,8 @@
 # Template file for 'libSwell'
 pkgname=libSwell
-version=221128
+version=230312
 revision=1
-_commit="a54057a1539a630c0bce4ca7b406d43874dec9ff"
+_commit="cdb6801559698128e2ea0a63821114a00c81ce64"
 wrksrc="WDL-${_commit}"
 make_build_args="GDK2=1"
 hostmakedepends="pkg-config"
@@ -12,7 +12,7 @@ maintainer="biopsin <biopsin@protonmail.com>"
 license="GPL-2-or-later"
 homepage="https://github.com/justinfrankel/WDL"
 distfiles="${homepage}/archive/${_commit}.zip"
-checksum=3a2526c38001cc0aaae041fe5563a44b789fcb48664d47ff2f8a1e0ea2391665
+checksum=30596e2fb206322bc3c374d8cb1e5f29471cac6c9c3fe70dfcfd33577555451d
 
 post_configure() {
 	# patch this gtk2 breakage for now
