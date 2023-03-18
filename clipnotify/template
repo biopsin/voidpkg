@@ -1,7 +1,9 @@
 # Template file for 'clipnotify'
 pkgname=clipnotify
-version=1.0.2
+version=1.0.3
 revision=1
+_commit=25ba143c7da8ae0f196cb0db2797d30e6d04e15c
+wrksrc="clipnotify-${_commit}"
 build_style=gnu-makefile
 makedepends="libX11-devel libXfixes-devel"
 short_desc="Notify on new X clipboard events"
@@ -9,7 +11,7 @@ maintainer="Hristos N. Triantafillou <voidpkg@hristos.lol>"
 license="Public Domain"
 homepage="https://github.com/cdown/clipnotify"
 distfiles="${homepage}/archive/${version}.tar.gz"
-checksum=949125472e8b7d8718ade926812ae99676b86c2f95c54f7bf47ab00ac8edc93c
+checksum=f5e8af9c2f23e2371d451643e24316568751d9b16b714e95f0be47bc24b2f906
 
 pre_build() {
 	CFLAGS+=" $LDFLAGS"
