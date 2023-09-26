@@ -10,6 +10,13 @@ ac_add_options --enable-pie
 ac_add_options --enable-av1
 ac_add_options --enable-jxl
 
+# Use system libs
+#ac_add_options --enable-system-cairo
+#ac_add_options --enable-system-pixman
+#ac_add_options --with-system-jpeg
+#ac_add_options --with-system-zlib
+#ac_add_options --with-system-bz2
+
 # Custom disabled
 ac_add_options --disable-gconf
 ac_add_options --disable-dbus
