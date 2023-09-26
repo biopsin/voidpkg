@@ -1,18 +1,18 @@
 # Template file for 'libSwell'
 pkgname=libSwell
-version=230527
+version=230818
 revision=1
-_commit="6a7ba42ab175a859c565c4f68b890048d53b94c7"
+_commit="fe860352f63539be920b03f713d624979efa3d63"
 wrksrc="WDL-${_commit}"
 make_build_args="GDK2=1"
 hostmakedepends="pkg-config"
 makedepends="gtk+-devel libXi-devel glew-devel"
 short_desc="Set of simple C++ classes"
-maintainer="biopsin <biopsin@protonmail.com>"
+maintainer="biopsin <biopsin@teknik.io>"
 license="GPL-2-or-later"
 homepage="https://github.com/justinfrankel/WDL"
 distfiles="${homepage}/archive/${_commit}.zip"
-checksum=16a9dab3d0b92f50219d908505409fcef3fc230e8b02b58cd7e25ade58ae1f40
+checksum=cec235011283d0cc469dd953a4239fff8b355bb4ac89abf0588cdf64ef15278e
 
 post_configure() {
 	# patch this gtk2 breakage for now
@@ -21,17 +21,16 @@ post_configure() {
 
 do_build() {
     cd ${wrksrc}/WDL/swell
-    make ${make_build_args}
+	make ${make_build_args}
     # Create the default colortheme
     make ${make_build_args} libSwell.colortheme
 }
 
 do_install() {
     vmkdir usr/lib/swell
-    cp ${wrksrc}/WDL/swell/{libSwell.so,libSwell.colortheme} "${DESTDIR}/usr/lib/swell"
+    cp ${wrksrc}/WDL/swell/{libSwell.so,libSwell.colortheme} ${DESTDIR}/usr/lib/swell
 
-    vmkdir usr/libexec/reaper
-    ln -sf /usr/lib/swell/libSwell.so "${DESTDIR}/usr/libexec/reaper"
-    ln -sf /usr/lib/swell/libSwell.colortheme "${DESTDIR}/usr/libexec/reaper"
+	vmkdir usr/libexec/reaper
+	ln -sf /usr/lib/swell/libSwell.so ${DESTDIR}/usr/libexec/reaper
+	ln -sf /usr/lib/swell/libSwell.colortheme ${DESTDIR}/usr/libexec/reaper
 }
-
