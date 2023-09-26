@@ -1,22 +1,24 @@
 # Template file for 'reaper'
 pkgname=reaper
-version=6.80
+version=6.82
 revision=1
 archs="i686 x86_64 aarch64 armv7l"
 wrksrc="reaper_linux_${XBPS_TARGET_MACHINE}"
 short_desc="Digital audio production application for computers"
-maintainer="fosslinux <fosslinux@aussies.space>"
+maintainer="fosslinux <biopsin@tuta.io>"
 license="custom:Propietary"
 homepage="https://www.reaper.fm"
 distfiles="https://www.reaper.fm/files/${version%.*}.x/reaper${version//.}_linux_${XBPS_TARGET_MACHINE}.tar.xz"
+# dl from old version
+#distfiles="https://www.landoleet.org/old/reaper${version//.}_linux_${XBPS_TARGET_MACHINE}.tar.xz"
 repository=nonfree
 nopie=yes
 
 # TODO: Build our own libSwell.so
 
 case "${XBPS_TARGET_MACHINE}" in
-	x86_64) checksum=072f7b3b1182f583bbc841f34a30c06470ad55ab9bd7037058c3a7e05f90ce98 ;;
-	i686) checksum=7113779ed27bca2c6ce5b4ca63a12c48ed086588564f02b89c5fb63b5c327952 ;;
+	x86_64) checksum=dafb643a874c8f42462d0427e1af971f1a1d1d0aa99d25b579aeefe9a0bdb07a ;;
+	i686) checksum=85827da1dcccb0cc6cfc3c4393581e1999dbc3de3fdb3794cb095819a5d62da2 ;;
 	armv7l) checksum=117daa711a1e67156994e56ca76bada6349536fab6f239ff65422d4183c8e4a5 ;;
 	aarch64) checksum=70564397a87a7980ae1f2fcadc5b1643c8337ade2a1aa180adb0dcbe03e14553 ;;
 esac
