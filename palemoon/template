@@ -1,8 +1,8 @@
 # Template file for 'Pale Moon'
 pkgname=palemoon
-version=32.4.0.1
+version=33.0.0
 revision=1
-_uxpver=RB_20230913
+_uxpver=RB_20240130
 wrksrc="pale-moon"
 hostmakedepends="curl autoconf213 unzip zip pkg-config perl python yasm tar which"
 makedepends="python-devel libatomic-devel gtk+-devel libXt-devel alsa-lib-devel
@@ -13,7 +13,7 @@ maintainer="biopsin <biopsin@yahoo.no>"
 license="MPL-2.0, GPL-2.0-or-later, LGPL-2.1-or-later"
 homepage="https://www.palemoon.org"
 distfiles="https://repo.palemoon.org/MoonchildProductions/Pale-Moon/archive/${version}_Release.tar.gz"
-checksum=4bce7385d6090c69bc64e4827814e080eea3b645fae8a0818c2fd41b74b724bc
+checksum=36bc3243ee294e2e10df9faac71d9831ef74a326e4622005a7be958505f282af
 python_version=2
 lib32disabled=yes
 
